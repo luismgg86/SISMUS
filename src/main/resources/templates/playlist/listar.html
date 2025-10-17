@@ -1,4 +1,15 @@
-<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment">
+<!-- templates/playlist/listar.html -->
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment" class="text-white">
+
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/base.css}" rel="stylesheet">
+    <link th:href="@{/css/layout.css}" rel="stylesheet">
+    <link th:href="@{/css/playlists.css}" rel="stylesheet">
+
+    <!-- Encabezado -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Tus Playlists</h3>
         <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#crearPlaylistModal">
@@ -6,10 +17,12 @@
         </button>
     </div>
 
+    <!-- Si no hay playlists -->
     <p th:if="${#lists.isEmpty(playlists)}" class="text-center text-secondary">
         No tienes playlists creadas todavía.
     </p>
 
+    <!--Listado de playlists -->
     <div class="row g-3" th:if="${!#lists.isEmpty(playlists)}">
         <div class="col-6 col-md-3" th:each="playlist : ${playlists}">
             <div class="card h-100 playlist-card"
@@ -48,7 +61,12 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre de la Playlist</label>
-                            <input type="text" id="nombre" name="nombre" class="form-control bg-dark text-white border-secondary" placeholder="Ejemplo: Música para Estudiar" required>
+                            <input type="text"
+                                   id="nombre"
+                                   name="nombre"
+                                   class="form-control bg-dark text-white border-secondary"
+                                   placeholder="Ejemplo: Música para Estudiar"
+                                   required>
                         </div>
                     </div>
                     <div class="modal-footer border-secondary">
@@ -60,38 +78,14 @@
         </div>
     </div>
 
-    <!-- Menú contextual (igual que en Canciones, pero con otro id) -->
-    <style>
-        /* Igual que el de Canciones, solo cambiamos a position:fixed para clavar al viewport */
-        #playlistContextMenu {
-            position: fixed;                 /* clave para que no “se vaya al fondo” */
-            display: none;
-            background-color: #181818;
-            border: 1px solid #333;
-            border-radius: 8px;
-            z-index: 2050;                   /* por encima del player */
-            min-width: 200px;
-            padding: 6px 0;
-        }
-        #playlistContextMenu a {
-            display: block;
-            padding: 10px;
-            color: #b3b3b3;
-            text-decoration: none;
-            font-size: 0.95rem;
-        }
-        #playlistContextMenu a:hover {
-            background-color: #282828;
-            color: #fff;
-        }
-    </style>
-
+    <!-- Menú contextual -->
     <div id="playlistContextMenu">
         <a href="#" id="deletePlaylistAction">🗑 Eliminar Playlist</a>
     </div>
 
     <!-- Modal Confirmación -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1"
+         aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark text-white">
                 <div class="modal-header border-secondary">
@@ -109,64 +103,9 @@
         </div>
     </div>
 
-    <!-- JS (mismo patrón que Canciones con jQuery) -->
+    <!-- 🔹 Scripts -->
     <script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
     <script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
-    <script>
-        $(function () {
-            const $menu = $("#playlistContextMenu");
-            const $nameHolder = $("#playlistNameToDelete");
-            const deleteModal = new bootstrap.Modal(document.getElementById("confirmDeleteModal"));
+    <script th:src="@{/js/playlists.js}"></script>
 
-            let selectedId = null;
-            let selectedName = null;
-
-            $(document).on("contextmenu", ".playlist-card", function (e) {
-                e.preventDefault();
-
-                selectedId = $(this).attr("data-playlist-id");
-                selectedName = $(this).attr("data-playlist-name");
-
-                const menuW = $menu.outerWidth() || 200;
-                const menuH = $menu.outerHeight() || 44;
-                const vw = $(window).width();
-                const vh = $(window).height();
-
-                let x = e.clientX;
-                let y = e.clientY;
-                if (x + menuW > vw) x = vw - menuW - 8;
-                if (y + menuH > vh) y = vh - menuH - 8;
-
-                $menu.css({ left: x + "px", top: y + "px" }).fadeIn(150);
-            });
-
-            $(document).on("click scroll resize", function () {
-                $menu.fadeOut(100);
-            });
-
-            $("#deletePlaylistAction").on("click", function (e) {
-                e.preventDefault();
-                $menu.hide();
-                $nameHolder.text(selectedName);
-                deleteModal.show();
-            });
-
-            $("#confirmDeleteBtn").on("click", function () {
-                $.ajax({
-                    url: "/playlists/" + selectedId + "/eliminar",
-                    type: "DELETE",
-                    headers: { "X-Requested-With": "XMLHttpRequest" },
-                    success: function () {
-                        deleteModal.hide();
-                        $(".playlist-card[data-playlist-id='" + selectedId + "']").closest(".col-6, .col-md-3").remove();
-                        // location.reload();
-                    },
-                    error: function () {
-                        deleteModal.hide();
-                        alert("Error al eliminar la playlist");
-                    }
-                });
-            });
-        });
-    </script>
 </div>

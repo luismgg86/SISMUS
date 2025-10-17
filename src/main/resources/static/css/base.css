@@ -1,0 +1,38 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #121212;
+  color: white;
+  font-family: 'Inter', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: #b3b3b3;
+}
+a:hover {
+  color: white;
+}
+
+.btn-instagram {
+  background: linear-gradient(45deg, #F58529, #DD2A7B, #8134AF, #515BD4);
+  background-size: 200% 200%;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 50px;
+  padding: 8px 15px;
+  border: none;
+  transition: background-position 0.3s ease, transform 0.2s ease;
+}
+.btn-instagram:hover {
+  background-position: right center;
+  transform: scale(1.03);
+}
+
+.alert-fixed {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+  display: none;
+}

@@ -26,12 +26,4 @@ public class Genero {
     @ToString.Exclude @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "genero")
     private List<Cancion> canciones;
-
-    public void agregarCancion(Cancion cancion) {
-        if (this.canciones == null) {
-            this.canciones = new java.util.ArrayList<>();
-        }
-        canciones.add(cancion);
-        cancion.setGenero(this);
-    }
 }

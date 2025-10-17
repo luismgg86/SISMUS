@@ -1,5 +1,6 @@
 package mx.dgtic.unam.sismus.service;
 
+import mx.dgtic.unam.sismus.exception.UsuarioNoEncontradoException;
 import mx.dgtic.unam.sismus.model.Usuario;
 import mx.dgtic.unam.sismus.repository.UsuarioRepository;
 import org.springframework.data.domain.Page;
@@ -28,13 +29,16 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public Usuario actualizar(Usuario usuario) {
         if (!usuarioRepository.existsById(usuario.getId())) {
-            throw new IllegalArgumentException("Usuario no encontrado con id: " + usuario.getId());
+            throw new UsuarioNoEncontradoException("Usuario no encontrado con ID: " + usuario.getId());
         }
         return usuarioRepository.save(usuario);
     }
 
     @Override
     public void eliminar(Integer id) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new UsuarioNoEncontradoException("No se puede eliminar: el usuario con ID " + id + " no existe.");
+        }
         usuarioRepository.deleteById(id);
     }
 

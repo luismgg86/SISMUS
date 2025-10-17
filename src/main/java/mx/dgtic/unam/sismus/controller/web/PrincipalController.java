@@ -1,4 +1,4 @@
-package mx.dgtic.unam.sismus.controller;
+package mx.dgtic.unam.sismus.controller.web;
 
 import mx.dgtic.unam.sismus.model.Lista;
 import mx.dgtic.unam.sismus.service.CancionService;
@@ -35,7 +35,6 @@ public class PrincipalController {
 
         Page<?> cancionesPage = cancionService.buscarPorTituloPaginado(query, pageable);
 
-        //Modificar para traer las playlist del usuario en el futuro
         List<Lista> playlists = listaService.obtenerListasPorUsuario("luismgg");
 
         model.addAttribute("cancionesPage", cancionesPage);
@@ -45,7 +44,7 @@ public class PrincipalController {
 
         model.addAttribute("playlists", playlists);
 
-        model.addAttribute("contenido", "paginas/canciones :: fragment");
+        model.addAttribute("contenido", "cancion/listar :: fragment");
         return "layout/main";
     }
 
@@ -55,7 +54,7 @@ public class PrincipalController {
         List<Lista> playlists = listaService.obtenerListasPorUsuario("luismgg");
 
         model.addAttribute("playlists", playlists);
-        model.addAttribute("contenido", "paginas/playlists :: fragment");
+        model.addAttribute("contenido", "playlist/listar :: fragment");
         return "layout/main";
     }
 }

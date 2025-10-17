@@ -30,12 +30,8 @@ public class Lista {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @ManyToMany
-    @JoinTable(
-            name = "lista_cancion",
-            joinColumns = @JoinColumn(name = "lista_id"),
-            inverseJoinColumns = @JoinColumn(name = "cancion_id")
-    )
-    private List<Cancion> canciones = new ArrayList<>();
+    @OneToMany(mappedBy = "lista", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ListaCancion> canciones = new ArrayList<>();
+
 
 }

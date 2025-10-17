@@ -25,9 +25,14 @@ public interface ListaRepository extends JpaRepository<Lista, Integer> {
     Page<Lista> findByUsuario_Nickname(String nickname, Pageable pageable);
 
     // Traer lista con canciones y usuario en una sola query
-    @EntityGraph(attributePaths = {"usuario", "canciones"})
-    @Query("select l from Lista l where l.id = :id")
+    @Query("""
+    SELECT l FROM Lista l
+    LEFT JOIN FETCH l.canciones lc
+    LEFT JOIN FETCH lc.cancion
+    WHERE l.id = :id
+    """)
     Lista findByIdConRelaciones(@Param("id") Integer id);
+
 
     // Traer todas las listas con canciones y usuario
     @EntityGraph(attributePaths = {"usuario", "canciones"})
@@ -43,14 +48,15 @@ public interface ListaRepository extends JpaRepository<Lista, Integer> {
     """)
     List<Lista> buscarPorCorreoUsuario(@Param("correo") String correo);
 
-    // JPQL: Buscar listas que contienen canciones con un título específico
     @Query("""
-        select DISTINCT l
-        from Lista l
-        join l.canciones c
-        where lower(c.titulo) like lower(concat('%', :titulo, '%'))
+    SELECT DISTINCT l
+    FROM Lista l
+    JOIN l.canciones lc
+    JOIN lc.cancion c
+    WHERE LOWER(c.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))
     """)
     List<Lista> buscarPorTituloDeCancion(@Param("titulo") String titulo);
+
 
     //Consultas para reportes
 

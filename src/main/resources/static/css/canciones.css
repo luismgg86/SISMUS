@@ -1,0 +1,46 @@
+.pagination .page-link {
+  background-color: #181818;
+  color: #b3b3b3;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+.pagination .page-link:hover {
+  background-color: #282828;
+  color: #ffffff;
+}
+.pagination .page-item.active .page-link {
+  background: linear-gradient(135deg, #FF0057, #FF2C8D, #FF6A00, #FFD600);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.context-menu {
+  position: absolute;
+  display: none;
+  background-color: #181818;
+  border: 1px solid #333;
+  border-radius: 8px;
+  z-index: 1050;
+  min-width: 200px;
+}
+.context-menu a {
+  display: block;
+  padding: 10px;
+  color: #b3b3b3;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.context-menu a:hover {
+  background-color: #282828;
+  color: #fff;
+}
+
+.card {
+  cursor: pointer;
+  background-color: #181818;
+  border: none;
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: scale(1.05);
+}

@@ -39,8 +39,8 @@ public class Cancion {
     private Genero genero;
 
     @ToString.Exclude @EqualsAndHashCode.Exclude
-    @ManyToMany(mappedBy = "canciones")
-    private List<Lista> listas = new ArrayList<>();
+    @OneToMany(mappedBy = "cancion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ListaCancion> listas = new ArrayList<>();
 
     @ToString.Exclude @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "cancion")

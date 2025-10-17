@@ -1,5 +1,6 @@
 package mx.dgtic.unam.sismus.service;
 
+import mx.dgtic.unam.sismus.exception.CancionNoEncontradaException;
 import mx.dgtic.unam.sismus.model.Cancion;
 import mx.dgtic.unam.sismus.repository.CancionRepository;
 import org.springframework.data.domain.Page;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -39,7 +39,7 @@ public class CancionServiceImpl implements CancionService {
     @Override
     public void eliminar(Integer id) {
         if (!cancionRepository.existsById(id)) {
-            throw new NoSuchElementException("La canción con ID " + id + " no existe.");
+            throw new CancionNoEncontradaException("La canción con ID " + id + " no existe.");
         }
         cancionRepository.deleteById(id);
     }
@@ -56,6 +56,4 @@ public class CancionServiceImpl implements CancionService {
         }
         return cancionRepository.findByTituloContainingIgnoreCase(titulo, pageable);
     }
-
-
 }

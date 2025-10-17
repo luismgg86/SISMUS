@@ -27,12 +27,4 @@ public class Artista {
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cancion> canciones;
 
-    public void agregarCancion(Cancion cancion) {
-        if (this.canciones == null) {
-            this.canciones = new java.util.ArrayList<>();
-        }
-        canciones.add(cancion);
-        cancion.setArtista(this);
-    }
-
 }

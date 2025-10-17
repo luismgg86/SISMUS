@@ -23,6 +23,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/bootstrap/**", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
@@ -36,7 +37,10 @@ public class SecurityConfiguration {
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
+                ).csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/**")
                 );
+
 
         return http.build();
     }
@@ -64,7 +68,7 @@ public class SecurityConfiguration {
 
     @Bean
     public UserDetailsManager inMemoryUserDetailsManager() {
-        var user = User.withUsername("luis")
+        var user = User.withUsername("luismgg")
                 .password("{noop}gonzalez")
                 .roles("USER")
                 .build();
