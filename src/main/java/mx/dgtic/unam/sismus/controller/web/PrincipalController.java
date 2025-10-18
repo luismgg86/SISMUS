@@ -1,6 +1,7 @@
 package mx.dgtic.unam.sismus.controller.web;
 
-import mx.dgtic.unam.sismus.model.Lista;
+import mx.dgtic.unam.sismus.dto.CancionResponseDto;
+import mx.dgtic.unam.sismus.dto.ListaResponseDto;
 import mx.dgtic.unam.sismus.service.CancionService;
 import mx.dgtic.unam.sismus.service.ListaService;
 import org.springframework.data.domain.Page;
@@ -25,34 +26,27 @@ public class PrincipalController {
     }
 
     @GetMapping("/")
-    public String mostrarPrincipal(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "q", defaultValue = "") String query,
-            Model model) {
+    public String mostrarPrincipal(@RequestParam(value = "page", defaultValue = "0") int page,
+                                   @RequestParam(value = "q", defaultValue = "") String query,
+                                   Model model) {
 
-        int pageSize = 8;
-        Pageable pageable = PageRequest.of(page, pageSize);
-
-        Page<?> cancionesPage = cancionService.buscarPorTituloPaginado(query, pageable);
-
-        List<Lista> playlists = listaService.obtenerListasPorUsuario("luismgg");
+        Pageable pageable = PageRequest.of(page, 8);
+        Page<CancionResponseDto> cancionesPage = cancionService.buscarPorTituloPaginado(query, pageable);
+        List<ListaResponseDto> playlists = listaService.obtenerListasPorUsuario("luismgg");
 
         model.addAttribute("cancionesPage", cancionesPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", cancionesPage.getTotalPages());
         model.addAttribute("query", query);
-
         model.addAttribute("playlists", playlists);
-
         model.addAttribute("contenido", "cancion/listar :: fragment");
+
         return "layout/main";
     }
 
-    // Vista de Playlists
     @GetMapping("/playlists")
     public String mostrarPlaylists(Model model) {
-        List<Lista> playlists = listaService.obtenerListasPorUsuario("luismgg");
-
+        List<ListaResponseDto> playlists = listaService.obtenerListasPorUsuario("luismgg");
         model.addAttribute("playlists", playlists);
         model.addAttribute("contenido", "playlist/listar :: fragment");
         return "layout/main";

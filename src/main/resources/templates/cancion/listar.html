@@ -27,9 +27,9 @@
                     <img th:src="@{/images/default.jpg}" class="card-img-top" alt="Imagen de Canción">
                     <div class="card-body">
                         <h6 class="card-title text-light" th:text="${cancion.titulo}">Título Canción</h6>
-                        <p class="card-text text-secondary" th:text="${cancion.artista.nombre}">Artista</p>
+                        <p class="card-text text-secondary" th:text="${cancion.artistaNombre}">Artista</p>
                         <small class="text-secondary">
-                            Género: <span th:text="${cancion.genero.nombre}">Pop</span>
+                            Género: <span th:text="${cancion.generoNombre}">Pop</span>
                         </small>
                     </div>
                 </div>

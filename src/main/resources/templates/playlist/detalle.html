@@ -32,8 +32,8 @@
 
             <tbody id="tbodyCanciones" th:fragment="fragmentoTabla">
             <tr class="cancion-row"
-                th:each="lc, iterStat : ${playlist.canciones}"
-                th:data-id="${lc.cancion.id}">
+                th:each="c, iterStat : ${playlist.canciones}"
+                th:data-id="${c.id}">
                 <td class="text-center text-light" th:text="${iterStat.index + 1}">1</td>
 
                 <td>
@@ -43,20 +43,20 @@
                              style="width: 45px; height: 45px; object-fit: cover;"
                              alt="Cover">
                         <div>
-                            <div class="fw-bold text-white" th:text="${lc.cancion.titulo}">Título Canción</div>
-                            <small class="text-light" th:text="${lc.cancion.artista.nombre}">Artista</small>
+                            <div class="fw-bold text-white" th:text="${c.titulo}">Título Canción</div>
+                            <small class="text-light" th:text="${c.artistaNombre}">Artista</small>
                         </div>
                     </div>
                 </td>
 
                 <td class="text-light"
-                    th:text="${#temporals.format(lc.fechaAgregada, 'dd/MM/yyyy')}">
+                    th:text="${#temporals.format(c.fechaAgregada, 'dd/MM/yyyy')}">
                     12/10/2025
                 </td>
 
                 <td class="text-end text-light">
-                    <span th:text="${lc.cancion.duracion != null
-                                    ? ((lc.cancion.duracion / 60) + ':' + #numbers.formatInteger(lc.cancion.duracion % 60, 2))
+                    <span th:text="${c.duracion != null
+                                    ? ((c.duracion / 60) + ':' + #numbers.formatInteger(c.duracion % 60, 2))
                                     : '0:00'}">0:00</span>
                 </td>
             </tr>
@@ -82,7 +82,7 @@
                     <option value="" disabled selected>Selecciona una canción</option>
                     <option th:each="cancion : ${cancionesDisponibles}"
                             th:value="${cancion.id}"
-                            th:text="${cancion.titulo + ' - ' + cancion.artista.nombre}">
+                            th:text="${cancion.titulo + ' - ' + cancion.artistaNombre}">
                     </option>
                 </select>
             </div>

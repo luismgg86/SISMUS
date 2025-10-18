@@ -1,6 +1,7 @@
 package mx.dgtic.unam.sismus.service;
 
-import mx.dgtic.unam.sismus.model.Usuario;
+import mx.dgtic.unam.sismus.dto.UsuarioRegistroDto;
+import mx.dgtic.unam.sismus.dto.UsuarioResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,22 +10,12 @@ import java.util.Optional;
 
 public interface UsuarioService {
 
-    Usuario crear(Usuario usuario);
-    Usuario actualizar(Usuario usuario);
+    UsuarioResponseDto registrar(UsuarioRegistroDto dto);
+    UsuarioResponseDto actualizar(Integer id, UsuarioRegistroDto dto);
     void eliminar(Integer id);
 
-    Optional<Usuario> buscarPorId(Integer id);
-    Optional<Usuario> buscarPorNickname(String nickname);
-    Optional<Usuario> buscarPorCorreo(String correo);
-
-    List<Usuario> listarTodos();
-    Page<Usuario> listarPaginado(String filtroNombre, Pageable pageable);
-
-    List<Usuario> usuariosConListas();
-    List<Usuario> usuariosSinDescargas();
-
-    List<Object[]> reporteTopUsuariosPorListas();
-    List<Object[]> reporteTopUsuariosPorDescargas();
-
-    List<Usuario> buscarPorNombreOCorreo(String filtro);
+    Optional<UsuarioResponseDto> buscarPorId(Integer id);
+    Optional<UsuarioResponseDto> buscarPorNickname(String nickname);
+    List<UsuarioResponseDto> listarTodos();
+    Page<UsuarioResponseDto> listarPaginado(String filtro, Pageable pageable);
 }

@@ -1,6 +1,7 @@
 package mx.dgtic.unam.sismus.service;
 
-import mx.dgtic.unam.sismus.model.Cancion;
+import mx.dgtic.unam.sismus.dto.CancionRequestDto;
+import mx.dgtic.unam.sismus.dto.CancionResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,15 +10,9 @@ import java.util.Optional;
 
 public interface CancionService {
 
-    List<Cancion> listarTodas();
-
-    Optional<Cancion> buscarPorId(Integer id);
-
-    Cancion guardar(Cancion cancion);
-
+    List<CancionResponseDto> listarTodas();
+    Optional<CancionResponseDto> buscarPorId(Integer id);
+    CancionResponseDto guardar(CancionRequestDto dto);
     void eliminar(Integer id);
-
-    boolean existsById(Integer id);
-
-    Page<Cancion> buscarPorTituloPaginado(String titulo, Pageable pageable);
+    Page<CancionResponseDto> buscarPorTituloPaginado(String titulo, Pageable pageable);
 }

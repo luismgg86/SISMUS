@@ -1,13 +1,12 @@
 package mx.dgtic.unam.sismus.controller.web;
 
 import jakarta.servlet.http.HttpServletRequest;
+import mx.dgtic.unam.sismus.dto.CancionResponseDto;
 import mx.dgtic.unam.sismus.exception.CancionNoEncontradaException;
-import mx.dgtic.unam.sismus.model.Cancion;
 import mx.dgtic.unam.sismus.model.Usuario;
-import mx.dgtic.unam.sismus.model.UsuarioCancion;
-import mx.dgtic.unam.sismus.repository.UsuarioRepository;
 import mx.dgtic.unam.sismus.service.CancionService;
 import mx.dgtic.unam.sismus.service.UsuarioCancionService;
+import mx.dgtic.unam.sismus.service.UsuarioService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -33,28 +32,23 @@ import java.time.LocalDate;
 public class CancionController {
 
     private final CancionService cancionService;
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
     private final UsuarioCancionService usuarioCancionService;
 
     public CancionController(CancionService cancionService,
-                             UsuarioRepository usuarioRepository,
+                             UsuarioService usuarioService,
                              UsuarioCancionService usuarioCancionService) {
         this.cancionService = cancionService;
-        this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
         this.usuarioCancionService = usuarioCancionService;
     }
 
-    // Fragmento de búsqueda
     @GetMapping("/buscar")
-    public String buscarCanciones(
-            @RequestParam(value = "q", defaultValue = "") String query,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            Model model) {
-
-        int pageSize = 8;
-        Pageable pageable = PageRequest.of(page, pageSize);
-
-        Page<?> cancionesPage = cancionService.buscarPorTituloPaginado(query, pageable);
+    public String buscarCanciones(@RequestParam(value = "q", defaultValue = "") String query,
+                                  @RequestParam(value = "page", defaultValue = "0") int page,
+                                  Model model) {
+        Pageable pageable = PageRequest.of(page, 8);
+        Page<CancionResponseDto> cancionesPage = cancionService.buscarPorTituloPaginado(query, pageable);
 
         model.addAttribute("cancionesPage", cancionesPage);
         model.addAttribute("currentPage", page);
@@ -64,42 +58,28 @@ public class CancionController {
         return "cancion/listar :: fragment";
     }
 
-    //Descarga de canción y registro de descarga
     @GetMapping("/{id}/descargar")
     public ResponseEntity<Resource> descargarCancion(@PathVariable Integer id, HttpServletRequest request) {
-        Cancion cancion = cancionService.buscarPorId(id)
+        CancionResponseDto cancion = cancionService.buscarPorId(id)
                 .orElseThrow(() -> new CancionNoEncontradaException("Canción no encontrada con ID: " + id));
 
-        // Registrar descarga (si hay usuario autenticado)
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            Usuario usuario = usuarioRepository.findByNickname(auth.getName()).orElse(null);
-            if (usuario != null) {
-                UsuarioCancion registro = new UsuarioCancion();
-                registro.setUsuario(usuario);
-                registro.setCancion(cancion);
-                registro.setFechaDescarga(LocalDate.now());
-                usuarioCancionService.registrarDescarga(registro);
-            }
+            usuarioService.buscarPorNickname(auth.getName()).ifPresent(usuarioDto -> {
+                Usuario usuario = new Usuario();
+                usuario.setId(usuarioDto.getId());
+                usuarioCancionService.registrarDescarga(usuario.getId(), cancion.getId());
+            });
         }
 
-        String rutaRelativa = cancion.getAudio();
-        Path rutaArchivo = Paths.get("src/main/resources/static" + rutaRelativa);
-
+        Path rutaArchivo = Paths.get("src/main/resources/static" + cancion.getAudio());
         try {
-            if (!Files.exists(rutaArchivo)) {
-                return ResponseEntity.notFound().build();
-            }
-
+            if (!Files.exists(rutaArchivo)) return ResponseEntity.notFound().build();
             Resource recurso = new UrlResource(rutaArchivo.toUri());
-            String nombreArchivo = recurso.getFilename();
-
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + nombreArchivo + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"")
                     .body(recurso);
-
         } catch (MalformedURLException e) {
             return ResponseEntity.internalServerError().build();
         }

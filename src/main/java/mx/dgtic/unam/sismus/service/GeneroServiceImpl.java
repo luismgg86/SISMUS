@@ -1,5 +1,8 @@
 package mx.dgtic.unam.sismus.service;
 
+import mx.dgtic.unam.sismus.dto.GeneroDto;
+import mx.dgtic.unam.sismus.exception.GeneroNoEncontradoException;
+import mx.dgtic.unam.sismus.mapper.GeneroMapper;
 import mx.dgtic.unam.sismus.model.Genero;
 import mx.dgtic.unam.sismus.repository.GeneroRepository;
 import org.springframework.data.domain.Page;
@@ -11,72 +14,55 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class GeneroServiceImpl implements GeneroService {
 
     private final GeneroRepository generoRepository;
+    private final GeneroMapper generoMapper;
 
-    public GeneroServiceImpl(GeneroRepository generoRepository) {
+    public GeneroServiceImpl(GeneroRepository generoRepository, GeneroMapper generoMapper) {
         this.generoRepository = generoRepository;
+        this.generoMapper = generoMapper;
     }
 
-    @Override
-    public List<Genero> listarTodos() {
-        return generoRepository.findAllByOrderByNombreAsc();
+    @Transactional(readOnly = true)
+    public List<GeneroDto> listarTodos() {
+        return generoRepository.findAllByOrderByNombreAsc()
+                .stream()
+                .map(generoMapper::toDto)
+                .toList();
     }
 
-    @Override
-    public Optional<Genero> buscarPorId(Integer id) {
-        return generoRepository.findById(id);
+    @Transactional(readOnly = true)
+    public Optional<GeneroDto> buscarPorId(Integer id) {
+        return generoRepository.findById(id).map(generoMapper::toDto);
     }
 
-    @Override
-    @Transactional
-    public Genero guardar(Genero genero) {
-        return generoRepository.save(genero);
+    public GeneroDto guardar(GeneroDto generoDto) {
+        Genero genero = generoMapper.toEntity(generoDto);
+        return generoMapper.toDto(generoRepository.save(genero));
     }
 
-    @Override
-    @Transactional
     public void eliminar(Integer id) {
+        if (!generoRepository.existsById(id))
+            throw new GeneroNoEncontradoException("Género no encontrado con ID " + id);
         generoRepository.deleteById(id);
     }
 
-    //Busquedas
-    @Override
-    public Optional<Genero> buscarPorClave(String clave) {
-        return generoRepository.findByClave(clave);
+    @Transactional(readOnly = true)
+    public Optional<GeneroDto> buscarPorClave(String clave) {
+        return generoRepository.findByClave(clave).map(generoMapper::toDto);
     }
 
-    @Override
-    public List<Genero> buscarPorNombre(String nombre) {
-        return generoRepository.findByNombreContainingIgnoreCase(nombre);
+    @Transactional(readOnly = true)
+    public List<GeneroDto> buscarPorNombre(String nombre) {
+        return generoRepository.findByNombreContainingIgnoreCase(nombre)
+                .stream().map(generoMapper::toDto).toList();
     }
 
-    @Override
-    public Page<Genero> buscarPorNombrePaginado(String nombre, Pageable pageable) {
-        return generoRepository.findByNombreContainingIgnoreCase(nombre, pageable);
-    }
-
-    //Relaciones
-    @Override
-    public Optional<Genero> detalleConCancionesPorClave(String clave) {
-        return generoRepository.detalleConCancionesPorClave(clave);
-    }
-
-    //Reportes
-    @Override
-    public List<Genero> generosSinCanciones() {
-        return generoRepository.generosSinCanciones();
-    }
-
-    @Override
-    public List<Object[]> reporteConteoCancionesPorGenero() {
-        return generoRepository.reporteConteoCancionesPorGenero();
-    }
-
-    //Consultas complejas
-    @Override
-    public List<Genero> buscarPorTituloDeCancion(String titulo) {
-        return generoRepository.buscarPorTituloDeCancion(titulo);
+    @Transactional(readOnly = true)
+    public Page<GeneroDto> buscarPorNombrePaginado(String nombre, Pageable pageable) {
+        return generoRepository.findByNombreContainingIgnoreCase(nombre, pageable)
+                .map(generoMapper::toDto);
     }
 }

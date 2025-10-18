@@ -1,8 +1,15 @@
 package mx.dgtic.unam.sismus.service;
 
+import mx.dgtic.unam.sismus.dto.CancionRequestDto;
+import mx.dgtic.unam.sismus.dto.CancionResponseDto;
 import mx.dgtic.unam.sismus.exception.CancionNoEncontradaException;
+import mx.dgtic.unam.sismus.mapper.CancionMapper;
+import mx.dgtic.unam.sismus.model.Artista;
 import mx.dgtic.unam.sismus.model.Cancion;
+import mx.dgtic.unam.sismus.model.Genero;
+import mx.dgtic.unam.sismus.repository.ArtistaRepository;
 import mx.dgtic.unam.sismus.repository.CancionRepository;
+import mx.dgtic.unam.sismus.repository.GeneroRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,44 +23,53 @@ import java.util.Optional;
 public class CancionServiceImpl implements CancionService {
 
     private final CancionRepository cancionRepository;
+    private final ArtistaRepository artistaRepository;
+    private final GeneroRepository generoRepository;
+    private final CancionMapper cancionMapper;
 
-    public CancionServiceImpl(CancionRepository cancionRepository) {
+    public CancionServiceImpl(CancionRepository cancionRepository,
+                              ArtistaRepository artistaRepository,
+                              GeneroRepository generoRepository,
+                              CancionMapper cancionMapper) {
         this.cancionRepository = cancionRepository;
+        this.artistaRepository = artistaRepository;
+        this.generoRepository = generoRepository;
+        this.cancionMapper = cancionMapper;
     }
 
-    @Override
-    public List<Cancion> listarTodas() {
-        return cancionRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<CancionResponseDto> listarTodas() {
+        return cancionRepository.findAll()
+                .stream()
+                .map(cancionMapper::toResponseDto)
+                .toList();
     }
 
-    @Override
-    public Optional<Cancion> buscarPorId(Integer id) {
-        return cancionRepository.findById(id);
+    @Transactional(readOnly = true)
+    public Optional<CancionResponseDto> buscarPorId(Integer id) {
+        return cancionRepository.findById(id).map(cancionMapper::toResponseDto);
     }
 
-    @Override
-    public Cancion guardar(Cancion cancion) {
-        return cancionRepository.save(cancion);
+    public CancionResponseDto guardar(CancionRequestDto dto) {
+        Artista artista = artistaRepository.findById(dto.getArtistaId())
+                .orElseThrow(() -> new IllegalArgumentException("Artista no encontrado"));
+        Genero genero = generoRepository.findById(dto.getGeneroId())
+                .orElseThrow(() -> new IllegalArgumentException("Género no encontrado"));
+        Cancion cancion = cancionMapper.toEntity(dto, artista, genero);
+        return cancionMapper.toResponseDto(cancionRepository.save(cancion));
     }
 
-    @Override
     public void eliminar(Integer id) {
-        if (!cancionRepository.existsById(id)) {
-            throw new CancionNoEncontradaException("La canción con ID " + id + " no existe.");
-        }
+        if (!cancionRepository.existsById(id))
+            throw new CancionNoEncontradaException("No existe canción con ID: " + id);
         cancionRepository.deleteById(id);
     }
 
-    @Override
-    public boolean existsById(Integer id) {
-        return cancionRepository.existsById(id);
-    }
-
-    @Override
-    public Page<Cancion> buscarPorTituloPaginado(String titulo, Pageable pageable) {
-        if (titulo == null || titulo.isEmpty()) {
-            return cancionRepository.findAll(pageable);
-        }
-        return cancionRepository.findByTituloContainingIgnoreCase(titulo, pageable);
+    @Transactional(readOnly = true)
+    public Page<CancionResponseDto> buscarPorTituloPaginado(String titulo, Pageable pageable) {
+        Page<Cancion> page = (titulo == null || titulo.isEmpty())
+                ? cancionRepository.findAll(pageable)
+                : cancionRepository.findByTituloContainingIgnoreCase(titulo, pageable);
+        return page.map(cancionMapper::toResponseDto);
     }
 }
