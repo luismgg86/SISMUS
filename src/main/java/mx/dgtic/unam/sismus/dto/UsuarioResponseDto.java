@@ -1,8 +1,8 @@
 package mx.dgtic.unam.sismus.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
+
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -12,5 +12,6 @@ public class UsuarioResponseDto {
     private String nombreCompleto;
     private String correo;
     private String nickname;
-    private Short rol;
+    private Set<String> roles;
 }
+

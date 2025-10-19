@@ -1,12 +1,11 @@
 package mx.dgtic.unam.sismus.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import mx.dgtic.unam.sismus.dto.ListaRequestDto;
 import mx.dgtic.unam.sismus.dto.ListaResponseDto;
 import mx.dgtic.unam.sismus.exception.CancionDuplicadaException;
 import mx.dgtic.unam.sismus.exception.CancionNoEncontradaException;
 import mx.dgtic.unam.sismus.exception.ListaNoEncontradaException;
-import mx.dgtic.unam.sismus.exception.UsuarioNoEncontradoException;
 import mx.dgtic.unam.sismus.mapper.ListaMapper;
 import mx.dgtic.unam.sismus.model.Cancion;
 import mx.dgtic.unam.sismus.model.Lista;
@@ -40,11 +39,13 @@ public class ListaServiceImpl implements ListaService {
     }
 
     public ListaResponseDto crearPlaylist(ListaRequestDto dto) {
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado" + dto.getUsuarioId()));
+        Usuario usuario = usuarioRepository.getReferenceById(dto.getUsuarioId());
+
         Lista lista = listaMapper.toEntity(dto, usuario);
         lista.setFechaCreacion(LocalDate.now());
-        return listaMapper.toResponseDto(listaRepository.save(lista));
+
+        lista = listaRepository.save(lista);
+        return listaMapper.toResponseDto(lista);
     }
 
     @Override

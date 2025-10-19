@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Sismus</title>
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/auth.css}" rel="stylesheet">
+</head>
+
+<body class="login-bg">
+
+<div class="login-card text-center">
+
+    <h3 class="text-white fw-bold mb-4">Crear cuenta en <span class="text-instagram">Sismus</span></h3>
+
+    <form th:action="@{/register}" method="post" th:object="${usuario}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div class="mb-3 text-start">
+            <label class="form-label text-white-50">Nombre</label>
+            <input type="text" th:field="*{nombre}" class="form-control bg-dark text-white border-0" required>
+        </div>
+
+        <div class="mb-3 text-start">
+            <label class="form-label text-white-50">Apellido Paterno</label>
+            <input type="text" th:field="*{apPaterno}" class="form-control bg-dark text-white border-0">
+        </div>
+
+        <div class="mb-3 text-start">
+            <label class="form-label text-white-50">Correo</label>
+            <input type="email" th:field="*{correo}" class="form-control bg-dark text-white border-0" required>
+        </div>
+
+        <div class="mb-3 text-start">
+            <label class="form-label text-white-50">Usuario (nickname)</label>
+            <input type="text" th:field="*{nickname}" class="form-control bg-dark text-white border-0" required>
+        </div>
+
+        <div class="mb-4 text-start">
+            <label class="form-label text-white-50">Contraseña</label>
+            <input type="password" th:field="*{password}" class="form-control bg-dark text-white border-0" required>
+        </div>
+
+        <button type="submit" class="btn btn-instagram w-100">Registrarse</button>
+
+        <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
+    </form>
+</div>
+
+<script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<div th:fragment="fragment">
+    <div class="container mt-4 text-white">
+        <h2 class="mb-3">Mi Perfil</h2>
+
+        <div class="card bg-dark text-white p-4">
+            <p><strong>Nombre:</strong> <span th:text="${usuario.nombreCompleto}">Luis González</span></p>
+            <p><strong>Correo:</strong> <span th:text="${usuario.correo}">correo@example.com</span></p>
+            <p><strong>Usuario:</strong> <span th:text="${usuario.nickname}">luismgg</span></p>
+            <p><strong>Rol:</strong> <span th:text="${usuario.roles == 1 ? 'USER' : 'ADMIN'}"></span></p>
+        </div>
+    </div>
+</div>

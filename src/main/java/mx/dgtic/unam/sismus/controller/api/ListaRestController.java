@@ -18,12 +18,6 @@ public class ListaRestController {
         this.listaService = listaService;
     }
 
-    @PostMapping
-    public ResponseEntity<ListaResponseDto> crearPlaylist(@RequestBody ListaRequestDto dto) {
-        ListaResponseDto nueva = listaService.crearPlaylist(dto);
-        return ResponseEntity.ok(nueva);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ListaResponseDto> obtenerPlaylist(@PathVariable Integer id) {
         return ResponseEntity.ok(listaService.obtenerConRelaciones(id));

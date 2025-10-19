@@ -13,5 +13,5 @@ public class UsuarioRegistroDto {
     private String apMaterno;
     private String correo;
     private String nickname;
-    private String contrasena;
+    private String password;
 }

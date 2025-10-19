@@ -9,8 +9,6 @@ import mx.dgtic.unam.sismus.model.Usuario;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Collectors;
-
 @Component
 public class ListaMapper {
 
@@ -23,6 +21,7 @@ public class ListaMapper {
     public Lista toEntity(ListaRequestDto dto, Usuario usuario) {
         Lista lista = modelMapper.map(dto, Lista.class);
         lista.setUsuario(usuario);
+        lista.setId(null);
         return lista;
     }
 

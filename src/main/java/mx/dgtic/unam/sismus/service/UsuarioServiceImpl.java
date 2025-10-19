@@ -4,11 +4,13 @@ import mx.dgtic.unam.sismus.dto.UsuarioRegistroDto;
 import mx.dgtic.unam.sismus.dto.UsuarioResponseDto;
 import mx.dgtic.unam.sismus.exception.UsuarioNoEncontradoException;
 import mx.dgtic.unam.sismus.mapper.UsuarioMapper;
+import mx.dgtic.unam.sismus.model.Rol;
 import mx.dgtic.unam.sismus.model.Usuario;
+import mx.dgtic.unam.sismus.repository.RolRepository;
 import mx.dgtic.unam.sismus.repository.UsuarioRepository;
-import mx.dgtic.unam.sismus.service.UsuarioService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,27 +22,42 @@ import java.util.Optional;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final RolRepository rolRepository;
     private final UsuarioMapper usuarioMapper;
+    private final PasswordEncoder passwordEncoder; // ✅
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository,
+                              RolRepository rolRepository,
+                              UsuarioMapper usuarioMapper,
+                              PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
         this.usuarioMapper = usuarioMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UsuarioResponseDto registrar(UsuarioRegistroDto dto) {
-        Usuario usuario = usuarioMapper.toEntity(dto);
+        Rol rolUser = rolRepository.findByNombre("USER")
+                .orElseThrow(() -> new RuntimeException("No existe el rol USER"));
+
+        Usuario usuario = usuarioMapper.toEntity(dto, rolUser);
         return usuarioMapper.toResponseDto(usuarioRepository.save(usuario));
     }
 
     public UsuarioResponseDto actualizar(Integer id, UsuarioRegistroDto dto) {
         Usuario existente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
+
         existente.setNombre(dto.getNombre());
         existente.setApPaterno(dto.getApPaterno());
         existente.setApMaterno(dto.getApMaterno());
         existente.setCorreo(dto.getCorreo());
         existente.setNickname(dto.getNickname());
-        existente.setContrasena(dto.getContrasena());
+
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            existente.setPassword(passwordEncoder.encode(dto.getPassword())); // ✅ Encripta
+        }
+
         return usuarioMapper.toResponseDto(usuarioRepository.save(existente));
     }
 

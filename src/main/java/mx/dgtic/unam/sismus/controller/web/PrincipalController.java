@@ -7,6 +7,8 @@ import mx.dgtic.unam.sismus.service.ListaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,11 +30,17 @@ public class PrincipalController {
     @GetMapping("/")
     public String mostrarPrincipal(@RequestParam(value = "page", defaultValue = "0") int page,
                                    @RequestParam(value = "q", defaultValue = "") String query,
+                                   @AuthenticationPrincipal UserDetails userDetails,
                                    Model model) {
 
         Pageable pageable = PageRequest.of(page, 8);
         Page<CancionResponseDto> cancionesPage = cancionService.buscarPorTituloPaginado(query, pageable);
-        List<ListaResponseDto> playlists = listaService.obtenerListasPorUsuario("luismgg");
+        List<ListaResponseDto> playlists = null;
+
+        if (userDetails != null) {
+            String nickname = userDetails.getUsername();
+            playlists = listaService.obtenerListasPorUsuario(nickname);
+        }
 
         model.addAttribute("cancionesPage", cancionesPage);
         model.addAttribute("currentPage", page);
@@ -44,11 +52,16 @@ public class PrincipalController {
         return "layout/main";
     }
 
+
     @GetMapping("/playlists")
-    public String mostrarPlaylists(Model model) {
-        List<ListaResponseDto> playlists = listaService.obtenerListasPorUsuario("luismgg");
-        model.addAttribute("playlists", playlists);
+    public String mostrarPlaylists(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        if (userDetails != null) {
+            String nickname = userDetails.getUsername();
+            List<ListaResponseDto> playlists = listaService.obtenerListasPorUsuario(nickname);
+            model.addAttribute("playlists", playlists);
+        }
         model.addAttribute("contenido", "playlist/listar :: fragment");
         return "layout/main";
     }
+
 }

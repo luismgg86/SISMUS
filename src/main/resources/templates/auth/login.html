@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:thymeleaf="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Iniciar sesión - Sismus</title>
@@ -40,6 +40,15 @@
             Sesión cerrada correctamente.
         </div>
     </form>
+
+    <!-- ✅ Enlace para ir a la pantalla de registro -->
+    <p class="mt-3 text-white-50">
+        ¿No tienes una cuenta?
+        <a th:href="@{/register}" class="text-instagram text-decoration-none fw-bold">
+            Regístrate aquí
+        </a>
+    </p>
+
 </div>
 
 <script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
