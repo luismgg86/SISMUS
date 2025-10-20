@@ -14,7 +14,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,6 +64,32 @@ public class CancionServiceImpl implements CancionService {
         Cancion cancion = cancionMapper.toEntity(dto, artista, genero);
         return cancionMapper.toResponseDto(cancionRepository.save(cancion));
     }
+
+    // En CancionServiceImpl
+    @Override
+    public void guardarCancionConArchivo(CancionRequestDto dto, MultipartFile archivo) throws IOException {
+
+        Artista artista = artistaRepository.findById(dto.getArtistaId())
+                .orElseThrow(() -> new RuntimeException("Artista no encontrado"));
+
+        Genero genero = generoRepository.findById(dto.getGeneroId())
+                .orElseThrow(() -> new RuntimeException("Género no encontrado"));
+
+        String nombreArchivo = archivo.getOriginalFilename();
+        Path ruta = Paths.get("src/main/resources/static/audios/" + nombreArchivo);
+        Files.createDirectories(ruta.getParent());
+        Files.write(ruta, archivo.getBytes());
+
+        dto.setAudio("/audios/" + nombreArchivo);
+        dto.setFechaAlta(LocalDate.now());
+
+        Cancion entidad = cancionMapper.toEntity(dto, artista, genero);
+
+        cancionRepository.save(entidad);
+    }
+
+
+
 
     public void eliminar(Integer id) {
         if (!cancionRepository.existsById(id))

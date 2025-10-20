@@ -36,6 +36,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Override
     public UsuarioResponseDto registrar(UsuarioRegistroDto dto) {
         Rol rolUser = rolRepository.findByNombre("USER")
                 .orElseThrow(() -> new RuntimeException("No existe el rol USER"));
@@ -44,6 +45,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioMapper.toResponseDto(usuarioRepository.save(usuario));
     }
 
+    @Override
     public UsuarioResponseDto actualizar(Integer id, UsuarioRegistroDto dto) {
         Usuario existente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
@@ -88,5 +90,24 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Page<UsuarioResponseDto> listarPaginado(String filtro, Pageable pageable) {
         return usuarioRepository.findByNombreContainingIgnoreCase(filtro, pageable)
                 .map(usuarioMapper::toResponseDto);
+    }
+
+    @Override
+    public void actualizarPassword(Integer idUsuario, String nuevaPassword) {
+        var usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(()-> new UsuarioNoEncontradoException("Usuario con Id: " + idUsuario + " no encontrado"));
+
+        usuario.setPassword(passwordEncoder.encode(nuevaPassword));
+        usuarioRepository.save(usuario);
+    }
+
+    @Override
+    public Optional<Usuario> buscarUsuarioPorNickname(String nickname) {
+        return usuarioRepository.findByNickname(nickname);
+    }
+
+    @Override
+    public Optional<Usuario> buscarUsuarioPorCorreo(String correo) {
+        return usuarioRepository.findByCorreo(correo);
     }
 }

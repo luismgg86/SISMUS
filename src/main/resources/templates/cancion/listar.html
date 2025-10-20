@@ -15,12 +15,10 @@
     </div>
 
     <div id="contenedor-canciones">
-        <!-- Si no hay canciones -->
         <p th:if="${#lists.isEmpty(cancionesPage.content)}" class="text-center text-secondary">
             No hay canciones registradas en la base de datos.
         </p>
 
-        <!-- Mostrar canciones -->
         <div class="row g-3" th:if="${!#lists.isEmpty(cancionesPage.content)}">
             <div class="col-6 col-md-3" th:each="cancion : ${cancionesPage.content}">
                 <div class="card song-card" th:data-id="${cancion.id}" th:data-title="${cancion.titulo}">
@@ -36,7 +34,6 @@
             </div>
         </div>
 
-        <!-- Paginador -->
         <nav th:if="${totalPages > 1}" aria-label="Paginación">
             <ul class="pagination justify-content-center mt-4">
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
@@ -55,13 +52,11 @@
         </nav>
     </div>
 
-    <!-- Menú contextual -->
     <div id="contextMenu" class="context-menu">
         <a href="#" id="addToPlaylistOption"> + Agregar a Playlist</a>
         <a href="#" id="downloadSong">  Descargar</a>
     </div>
 
-    <!-- Modal para seleccionar Playlist -->
     <div class="modal fade" id="selectPlaylistModal" tabindex="-1" aria-labelledby="selectPlaylistModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark text-white">
@@ -92,12 +87,10 @@
         </div>
     </div>
 
-    <!-- Alerta de éxito -->
     <div id="successAlert" class="alert alert-success alert-fixed">
         Canción agregada correctamente a la playlist.
     </div>
 
-    <!-- Alerta de error (canción duplicada) -->
     <div id="errorAlert" class="alert alert-danger alert-fixed">
         La canción ya existe en esta playlist.
     </div>

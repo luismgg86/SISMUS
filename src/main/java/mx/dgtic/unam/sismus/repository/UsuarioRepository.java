@@ -37,6 +37,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     @Query("select u from Usuario u where u.id = :id")
     Optional<Usuario> findByIdConRelaciones(@Param("id") Integer id);
 
+
     /* ==========================
        Consultas personalizadas
        ========================== */

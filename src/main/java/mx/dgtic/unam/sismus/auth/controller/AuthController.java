@@ -7,6 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AuthController {
@@ -38,5 +40,38 @@ public class AuthController {
             return "auth/register";
         }
     }
+
+    @GetMapping("/recuperar-password")
+    public String mostrarFormularioRecuperarPassword() {
+        return "auth/recuperar-password";
+    }
+
+    @PostMapping("/recuperar-password")
+    public String procesarRecuperacion(@RequestParam String correo,
+                                       @RequestParam String nuevaPassword,
+                                       @RequestParam String confirmarPassword,
+                                       RedirectAttributes redirectAttributes,
+                                       Model model) {
+
+        if (!nuevaPassword.equals(confirmarPassword)) {
+            model.addAttribute("error", "Las contraseñas no coinciden.");
+            model.addAttribute("correo", correo);
+            return "auth/recuperar-password";
+        }
+
+        var usuario = usuarioService.buscarUsuarioPorCorreo(correo);
+        if (usuario.isEmpty()) {
+            model.addAttribute("error", "No existe un usuario con ese correo.");
+            return "auth/recuperar-password";
+        }
+
+        usuarioService.actualizarPassword(usuario.get().getId(), nuevaPassword);
+
+        redirectAttributes.addFlashAttribute("success", "Contraseña actualizada. Inicia sesión.");
+        return "redirect:/login";
+    }
+
+
+
 }
 

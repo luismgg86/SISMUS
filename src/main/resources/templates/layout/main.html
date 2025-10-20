@@ -31,6 +31,10 @@
                 <a th:href="@{/playlists}">Tus Playlists</a>
                 <hr class="text-secondary">
                 <a th:href="@{/favoritos}">Tus Favoritos</a>
+                <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <hr class="text-secondary">
+                    <a th:href="@{/admin/canciones}">Administrar Canciones</a>
+                </div>
             </div>
 
             <!-- Boton de Cerrar sesión fijo abajo -->
@@ -45,7 +49,7 @@
         <!-- Contenido dinamico -->
         <div class="col-12 col-md-10">
             <div class="content-area">
-                <div th:replace="__${contenido}__"></div>
+                <div th:replace="~{${contenido} :: fragment}"></div>
             </div>
         </div>
     </div>

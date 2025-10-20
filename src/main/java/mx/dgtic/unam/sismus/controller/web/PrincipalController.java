@@ -47,7 +47,7 @@ public class PrincipalController {
         model.addAttribute("totalPages", cancionesPage.getTotalPages());
         model.addAttribute("query", query);
         model.addAttribute("playlists", playlists);
-        model.addAttribute("contenido", "cancion/listar :: fragment");
+        model.addAttribute("contenido", "cancion/listar");
 
         return "layout/main";
     }
@@ -60,7 +60,7 @@ public class PrincipalController {
             List<ListaResponseDto> playlists = listaService.obtenerListasPorUsuario(nickname);
             model.addAttribute("playlists", playlists);
         }
-        model.addAttribute("contenido", "playlist/listar :: fragment");
+        model.addAttribute("contenido", "playlist/listar");
         return "layout/main";
     }
 

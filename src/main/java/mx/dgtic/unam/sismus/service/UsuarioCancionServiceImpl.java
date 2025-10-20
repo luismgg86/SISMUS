@@ -5,6 +5,7 @@ import mx.dgtic.unam.sismus.exception.CancionNoEncontradaException;
 import mx.dgtic.unam.sismus.exception.UsuarioNoEncontradoException;
 import mx.dgtic.unam.sismus.mapper.UsuarioCancionMapper;
 import mx.dgtic.unam.sismus.model.Cancion;
+import mx.dgtic.unam.sismus.model.Lista;
 import mx.dgtic.unam.sismus.model.Usuario;
 import mx.dgtic.unam.sismus.model.UsuarioCancion;
 import mx.dgtic.unam.sismus.repository.CancionRepository;
@@ -74,4 +75,6 @@ public class UsuarioCancionServiceImpl implements UsuarioCancionService {
     public boolean existeDescarga(Integer usuarioId, Integer cancionId) {
         return usuarioCancionRepository.existsByUsuarioIdAndCancionId(usuarioId, cancionId);
     }
+
+
 }

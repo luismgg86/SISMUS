@@ -19,7 +19,7 @@ public class SecurityConfiguration {
         http
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/bootstrap/**", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/auth", "/register", "/recuperar-password").permitAll()
                         .requestMatchers("/usuario/**").authenticated()
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

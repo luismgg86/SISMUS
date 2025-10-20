@@ -25,9 +25,16 @@ public class CancionMapper {
     }
 
     public Cancion toEntity(CancionRequestDto dto, Artista artista, Genero genero) {
-        Cancion entity = modelMapper.map(dto, Cancion.class);
+        Cancion entity = new Cancion();
+
+        entity.setTitulo(dto.getTitulo());
+        entity.setAudio(dto.getAudio());
+        entity.setDuracion(dto.getDuracion());
+        entity.setFechaAlta(dto.getFechaAlta());
+
         entity.setArtista(artista);
         entity.setGenero(genero);
+
         return entity;
     }
 }

@@ -1,0 +1,38 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment">
+
+    <div class="container mt-4 text-white">
+
+        <h2 class="mb-3">Administrar Canciones</h2>
+
+        <a class="btn btn-success mb-3" th:href="@{/admin/canciones/nueva}">
+            ➕ Agregar nueva canción
+        </a>
+
+        <table class="table table-dark table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Artista</th>
+                <th>Género</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${canciones}">
+                <td th:text="${c.id}"></td>
+                <td th:text="${c.titulo}"></td>
+                <td th:text="${c.artistaNombre}"></td>   <!-- ✅ -->
+                <td th:text="${c.generoNombre}"></td>    <!-- ✅ -->
+                <td>
+                    <a class="btn btn-danger btn-sm"
+                       th:href="@{'/admin/canciones/eliminar/' + ${c.id}}">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

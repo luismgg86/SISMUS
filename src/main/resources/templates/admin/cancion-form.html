@@ -1,0 +1,58 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment">
+
+    <div class="container mt-4 text-white">
+
+        <h2 class="mb-4">Agregar Nueva Canción</h2>
+
+        <!-- Formulario -->
+        <form th:action="@{/admin/canciones/guardar}"
+              th:object="${cancion}"
+              method="post"
+              enctype="multipart/form-data"
+              class="bg-dark p-4 rounded shadow">
+
+            <!-- Título -->
+            <div class="mb-3">
+                <label class="form-label">Título:</label>
+                <input type="text" th:field="*{titulo}" class="form-control bg-secondary text-white" required>
+            </div>
+
+            <!-- Artista -->
+            <div class="mb-3">
+                <label class="form-label">Artista:</label>
+                <select th:field="*{artistaId}" class="form-select bg-secondary text-white" required>
+                    <option value="" disabled selected>Selecciona un artista</option>
+                    <option th:each="art : ${artistas}"
+                            th:value="${art.id}"
+                            th:text="${art.nombre}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Género -->
+            <div class="mb-3">
+                <label class="form-label">Género:</label>
+                <select th:field="*{generoId}" class="form-select bg-secondary text-white" required>
+                    <option value="" disabled selected>Selecciona un género</option>
+                    <option th:each="gen : ${generos}"
+                            th:value="${gen.id}"
+                            th:text="${gen.nombre}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Archivo MP3 -->
+            <div class="mb-3">
+                <label class="form-label">Archivo MP3:</label>
+                <input type="file" name="archivo"
+                       accept=".mp3"
+                       class="form-control bg-secondary text-white"
+                       required>
+            </div>
+
+            <!-- Botones -->
+            <button type="submit" class="btn btn-success">Guardar Canción</button>
+            <a th:href="@{/admin/canciones}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
