@@ -1,6 +1,7 @@
 package mx.dgtic.unam.sismus.service;
 
 import mx.dgtic.unam.sismus.dto.GeneroDto;
+import mx.dgtic.unam.sismus.exception.EntidadDuplicadaException;
 import mx.dgtic.unam.sismus.exception.GeneroNoEncontradoException;
 import mx.dgtic.unam.sismus.mapper.GeneroMapper;
 import mx.dgtic.unam.sismus.model.Genero;
@@ -49,6 +50,21 @@ public class GeneroServiceImpl implements GeneroService {
         generoRepository.deleteById(id);
     }
 
+    @Override
+    public void actualizar(Integer id, GeneroDto dto) {
+        Genero existente = generoRepository.findById(id)
+                .orElseThrow(() -> new GeneroNoEncontradoException("Género con ID " + id + " no encontrado"));
+
+        if (!existente.getClave().equals(dto.getClave()) &&
+                generoRepository.existsByClave(dto.getClave())) {
+            throw new EntidadDuplicadaException("Ya existe un género con la clave: " + dto.getClave());
+        }
+
+        existente.setClave(dto.getClave());
+        existente.setNombre(dto.getNombre());
+        generoRepository.save(existente);
+    }
+
     @Transactional(readOnly = true)
     public Optional<GeneroDto> buscarPorClave(String clave) {
         return generoRepository.findByClave(clave).map(generoMapper::toDto);
@@ -65,4 +81,6 @@ public class GeneroServiceImpl implements GeneroService {
         return generoRepository.findByNombreContainingIgnoreCase(nombre, pageable)
                 .map(generoMapper::toDto);
     }
+
+
 }

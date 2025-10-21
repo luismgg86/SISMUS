@@ -1,0 +1,31 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment">
+
+    <div class="container mt-4 text-white">
+        <h2 class="mb-3">Administrar Géneros</h2>
+
+        <a class="btn btn-success mb-3" th:href="@{/admin/generos/nuevo}">➕ Nuevo Género</a>
+
+        <table class="table table-dark table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Clave</th>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="g : ${generos}">
+                <td th:text="${g.id}"></td>
+                <td th:text="${g.clave}"></td>
+                <td th:text="${g.nombre}"></td>
+                <td>
+                    <a class="btn btn-warning btn-sm"
+                       th:href="@{'/admin/generos/editar/' + ${g.id}}">✏️ Editar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

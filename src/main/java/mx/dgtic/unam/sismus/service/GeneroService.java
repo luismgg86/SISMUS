@@ -13,8 +13,9 @@ public interface GeneroService {
     Optional<GeneroDto> buscarPorId(Integer id);
     GeneroDto guardar(GeneroDto genero);
     void eliminar(Integer id);
-
-    Optional<GeneroDto> buscarPorClave(String clave);
-    List<GeneroDto> buscarPorNombre(String nombre);
-    Page<GeneroDto> buscarPorNombrePaginado(String nombre, Pageable pageable);
+    void actualizar(Integer id, GeneroDto dto);
+//
+//    Optional<GeneroDto> buscarPorClave(String clave);
+//    List<GeneroDto> buscarPorNombre(String nombre);
+//    Page<GeneroDto> buscarPorNombrePaginado(String nombre, Pageable pageable);
 }

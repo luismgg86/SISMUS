@@ -1,0 +1,28 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment">
+
+    <div class="container mt-4 text-white">
+
+        <h2 th:text="${modo == 'editar'} ? 'Editar Género' : 'Nuevo Género'"></h2>
+
+        <form th:action="@{/admin/generos/guardar}" th:object="${genero}" method="post"
+              class="bg-dark p-4 rounded shadow">
+            <input type="hidden" th:if="${id}" name="id" th:value="${id}"/>
+
+            <div class="mb-3">
+                <label class="form-label">Clave:</label>
+                <input type="text" th:field="*{clave}" class="form-control bg-secondary text-white" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Nombre:</label>
+                <input type="text" th:field="*{nombre}" class="form-control bg-secondary text-white" required>
+            </div>
+
+            <div th:if="${errorMensaje}" class="alert alert-danger mt-3" th:text="${errorMensaje}"></div>
+
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <a th:href="@{/admin/generos}" class="btn btn-secondary">Cancelar</a>
+        </form>
+
+    </div>
+</div>

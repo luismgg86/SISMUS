@@ -32,6 +32,8 @@ public interface GeneroRepository extends JpaRepository<Genero, Integer> {
     // Ordenar alfabéticamente
     List<Genero> findAllByOrderByNombreAsc();
 
+    boolean existsByClave(String clave);
+
     /* ==========================
        Optimización para relaciones
        ========================== */
