@@ -8,12 +8,15 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UsuarioService {
 
     UsuarioResponseDto registrar(UsuarioRegistroDto dto);
     UsuarioResponseDto actualizar(Integer id, UsuarioRegistroDto dto);
     void eliminar(Integer id);
+    void cambiarEstado(Integer id, boolean activo);
+    void actualizarRoles(Integer id, Set<String> roles);
 
     Optional<UsuarioResponseDto> buscarPorId(Integer id);
     Optional<UsuarioResponseDto> buscarPorNickname(String nickname);

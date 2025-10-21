@@ -37,6 +37,9 @@ public class Usuario {
     @Column(length = 60)
     private String password;
 
+    @Column(nullable = false)
+    private Boolean activo = true;
+
     @ToString.Exclude @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsuarioCancion> cancionesDescargadas;

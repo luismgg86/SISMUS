@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -24,7 +25,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final UsuarioMapper usuarioMapper;
-    private final PasswordEncoder passwordEncoder; // ✅
+    private final PasswordEncoder passwordEncoder;
 
     public UsuarioServiceImpl(UsuarioRepository usuarioRepository,
                               RolRepository rolRepository,
@@ -109,5 +110,21 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public Optional<Usuario> buscarUsuarioPorCorreo(String correo) {
         return usuarioRepository.findByCorreo(correo);
+    }
+
+    public void cambiarEstado(Integer id, boolean activo) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID " + id));
+        usuario.setActivo(activo);
+        usuarioRepository.save(usuario);
+    }
+
+    public void actualizarRoles(Integer id, Set<String> roles) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID " + id));
+
+        Set<Rol> nuevosRoles = rolRepository.findByNombreIn(roles);
+        usuario.setRoles(nuevosRoles);
+        usuarioRepository.save(usuario);
     }
 }
