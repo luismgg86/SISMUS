@@ -15,6 +15,9 @@ public interface ArtistaService {
     Optional<ArtistaDto> buscarPorId(Integer id);
     ArtistaDto guardar(ArtistaDto artistaDto);
     void eliminar(Integer id);
+    List<ArtistaDto> listarActivos();
+    List<ArtistaDto> listarInactivos();
+    void activar(Integer id);
 
     // Búsquedas
     Optional<ArtistaDto> buscarPorClave(String clave);
@@ -27,4 +30,8 @@ public interface ArtistaService {
 
     // Reportes
     List<ArtistaDto> artistasSinCanciones();
+
+    // 🔹 Administración
+    void actualizar(Integer id, ArtistaDto dto);
+    void reactivar(Integer id);
 }

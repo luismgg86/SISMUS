@@ -13,9 +13,13 @@ import java.util.Optional;
 public interface CancionService {
 
     List<CancionResponseDto> listarTodas();
+    List<CancionResponseDto> listarInactivas();
     Optional<CancionResponseDto> buscarPorId(Integer id);
-    CancionResponseDto guardar(CancionRequestDto dto);
+    //CancionResponseDto guardar(CancionRequestDto dto);
+    void actualizarCancion(Integer id, CancionRequestDto dto, MultipartFile archivo) throws IOException;
     void guardarCancionConArchivo(CancionRequestDto dto, MultipartFile archivo) throws IOException;
     void eliminar(Integer id);
-    Page<CancionResponseDto> buscarPorTituloPaginado(String titulo, Pageable pageable);
+    void reactivarCancion(Integer id);
+    //Page<CancionResponseDto> buscarPorTituloPaginado(String titulo, Pageable pageable);
+    Page<CancionResponseDto> buscarPorTituloActivoPaginado(String titulo, Pageable pageable);
 }

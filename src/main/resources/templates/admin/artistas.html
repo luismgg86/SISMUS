@@ -1,0 +1,49 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment">
+
+    <div class="container mt-4 text-white">
+        <h2 class="mb-3" th:text="${tituloSeccion} ?: 'Administrar Artistas'"></h2>
+
+        <div class="d-flex justify-content-between mb-3">
+            <a class="btn btn-success" th:href="@{/admin/artistas/nuevo}">➕ Nuevo Artista</a>
+            <a class="btn btn-outline-warning"
+               th:if="${tituloSeccion} != 'Artistas Inactivos'"
+               th:href="@{/admin/artistas/inactivos}">🕓 Ver inactivos</a>
+            <a class="btn btn-outline-light"
+               th:if="${tituloSeccion} == 'Artistas Inactivos'"
+               th:href="@{/admin/artistas}">⬅️ Volver a activos</a>
+        </div>
+
+        <table class="table table-dark table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Clave</th>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${artistas}">
+                <td th:text="${a.id}"></td>
+                <td th:text="${a.clave}"></td>
+                <td th:text="${a.nombre}"></td>
+                <td>
+                    <a class="btn btn-warning btn-sm"
+                       th:href="@{'/admin/artistas/editar/' + ${a.id}}">✏️ Editar</a>
+
+                    <a class="btn btn-danger btn-sm"
+                       th:if="${tituloSeccion} != 'Artistas Inactivos'"
+                       th:href="@{'/admin/artistas/eliminar/' + ${a.id}}"
+                       onclick="return confirm('¿Desactivar este artista?')">🗑️ Desactivar</a>
+
+                    <a class="btn btn-success btn-sm"
+                       th:if="${tituloSeccion} == 'Artistas Inactivos'"
+                       th:href="@{'/admin/artistas/activar/' + ${a.id}}"
+                       onclick="return confirm('¿Reactivar este artista?')">✅ Activar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

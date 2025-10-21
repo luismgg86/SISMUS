@@ -2,14 +2,15 @@
 
     <div class="container mt-4 text-white">
 
-        <h2 class="mb-4">Agregar Nueva Canción</h2>
+        <h2 class="mb-4" th:text="${modo == 'editar'} ? 'Editar Canción' : 'Agregar Nueva Canción'"></h2>
 
-        <!-- Formulario -->
         <form th:action="@{/admin/canciones/guardar}"
               th:object="${cancion}"
               method="post"
               enctype="multipart/form-data"
               class="bg-dark p-4 rounded shadow">
+
+            <input type="hidden" name="id" th:value="${id}" />
 
             <!-- Título -->
             <div class="mb-3">
@@ -47,12 +48,18 @@
                 <input type="file" name="archivo"
                        accept=".mp3"
                        class="form-control bg-secondary text-white"
-                       required>
+                       th:required="${modo == 'crear'}" />
+                <small th:if="${modo == 'editar'}" class="text-muted">
+                    (Deja vacío para mantener el archivo actual)
+                </small>
             </div>
 
             <!-- Botones -->
-            <button type="submit" class="btn btn-success">Guardar Canción</button>
+            <button type="submit" class="btn btn-success">
+                <span th:text="${modo == 'editar'} ? 'Actualizar' : 'Guardar'"></span>
+            </button>
             <a th:href="@{/admin/canciones}" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>
+
 </div>

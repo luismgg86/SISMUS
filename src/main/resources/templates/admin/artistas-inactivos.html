@@ -1,0 +1,30 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment">
+
+    <div class="container mt-4 text-white">
+        <h2 class="mb-3">Artistas Inactivos</h2>
+
+        <a class="btn btn-secondary mb-3" th:href="@{/admin/artistas}">🔙 Volver</a>
+
+        <table class="table table-dark table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Clave</th>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${artistas}">
+                <td th:text="${a.id}"></td>
+                <td th:text="${a.clave}"></td>
+                <td th:text="${a.nombre}"></td>
+                <td>
+                    <a class="btn btn-success btn-sm" th:href="@{'/admin/artistas/reactivar/' + ${a.id}}">♻️ Reactivar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

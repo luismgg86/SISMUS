@@ -38,6 +38,9 @@ public class Cancion {
     @JoinColumn(name = "genero_id", nullable = false)
     private Genero genero;
 
+    @Column(nullable = false)
+    private Boolean activo = true;
+
     @ToString.Exclude @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "cancion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ListaCancion> listas = new ArrayList<>();

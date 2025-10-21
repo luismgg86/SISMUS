@@ -2,7 +2,9 @@ package mx.dgtic.unam.sismus.service;
 
 import mx.dgtic.unam.sismus.dto.CancionRequestDto;
 import mx.dgtic.unam.sismus.dto.CancionResponseDto;
+import mx.dgtic.unam.sismus.exception.ArtistaNoEncontradoException;
 import mx.dgtic.unam.sismus.exception.CancionNoEncontradaException;
+import mx.dgtic.unam.sismus.exception.GeneroNoEncontradoException;
 import mx.dgtic.unam.sismus.mapper.CancionMapper;
 import mx.dgtic.unam.sismus.model.Artista;
 import mx.dgtic.unam.sismus.model.Cancion;
@@ -43,37 +45,72 @@ public class CancionServiceImpl implements CancionService {
         this.cancionMapper = cancionMapper;
     }
 
+    // ✅ Listar solo canciones activas
     @Transactional(readOnly = true)
     public List<CancionResponseDto> listarTodas() {
-        return cancionRepository.findAll()
+        return cancionRepository.findByActivoTrue()
                 .stream()
                 .map(cancionMapper::toResponseDto)
                 .toList();
     }
 
+    // ✅ Buscar por ID (solo si está activa)
     @Transactional(readOnly = true)
     public Optional<CancionResponseDto> buscarPorId(Integer id) {
-        return cancionRepository.findById(id).map(cancionMapper::toResponseDto);
+        return cancionRepository.findById(id)
+                .filter(Cancion::getActivo)
+                .map(cancionMapper::toResponseDto);
     }
 
+    // ✅ Guardar nueva canción
     public CancionResponseDto guardar(CancionRequestDto dto) {
         Artista artista = artistaRepository.findById(dto.getArtistaId())
-                .orElseThrow(() -> new IllegalArgumentException("Artista no encontrado"));
+                .orElseThrow(() -> new ArtistaNoEncontradoException("No existe artista con id: " + dto.getArtistaId()));
         Genero genero = generoRepository.findById(dto.getGeneroId())
-                .orElseThrow(() -> new IllegalArgumentException("Género no encontrado"));
+                .orElseThrow(() -> new GeneroNoEncontradoException("No existe género con id: " + dto.getGeneroId()));
         Cancion cancion = cancionMapper.toEntity(dto, artista, genero);
+        cancion.setActivo(true);
         return cancionMapper.toResponseDto(cancionRepository.save(cancion));
     }
 
-    // En CancionServiceImpl
+    // ✅ Actualizar canción (mantiene activa)
+    @Override
+    public void actualizarCancion(Integer id, CancionRequestDto dto, MultipartFile archivo) throws IOException {
+        Cancion cancion = cancionRepository.findById(id)
+                .orElseThrow(() -> new CancionNoEncontradaException("No existe canción con id: " + id));
+
+        Artista artista = artistaRepository.findById(dto.getArtistaId())
+                .orElseThrow(() -> new ArtistaNoEncontradoException("No existe artista con id: " + dto.getArtistaId()));
+        Genero genero = generoRepository.findById(dto.getGeneroId())
+                .orElseThrow(() -> new GeneroNoEncontradoException("No existe género con id: " + dto.getGeneroId()));
+
+        cancion.setTitulo(dto.getTitulo());
+        cancion.setDuracion(dto.getDuracion());
+        cancion.setArtista(artista);
+        cancion.setGenero(genero);
+        cancion.setFechaAlta(LocalDate.now());
+        cancion.setActivo(true);
+
+        if (archivo != null && !archivo.isEmpty()) {
+            String nombreArchivo = archivo.getOriginalFilename();
+            Path ruta = Paths.get("src/main/resources/static/audios/" + nombreArchivo);
+            Files.createDirectories(ruta.getParent());
+            Files.write(ruta, archivo.getBytes());
+            cancion.setAudio("/audios/" + nombreArchivo);
+        }
+
+        cancionRepository.save(cancion);
+    }
+
+    // ✅ Guardar canción con archivo (nueva)
     @Override
     public void guardarCancionConArchivo(CancionRequestDto dto, MultipartFile archivo) throws IOException {
 
         Artista artista = artistaRepository.findById(dto.getArtistaId())
-                .orElseThrow(() -> new RuntimeException("Artista no encontrado"));
+                .orElseThrow(() -> new ArtistaNoEncontradoException("No existe artista con id: " + dto.getArtistaId()));
 
         Genero genero = generoRepository.findById(dto.getGeneroId())
-                .orElseThrow(() -> new RuntimeException("Género no encontrado"));
+                .orElseThrow(() -> new GeneroNoEncontradoException("No existe género con id: " + dto.getGeneroId()));
 
         String nombreArchivo = archivo.getOriginalFilename();
         Path ruta = Paths.get("src/main/resources/static/audios/" + nombreArchivo);
@@ -84,24 +121,50 @@ public class CancionServiceImpl implements CancionService {
         dto.setFechaAlta(LocalDate.now());
 
         Cancion entidad = cancionMapper.toEntity(dto, artista, genero);
+        entidad.setActivo(true);
 
         cancionRepository.save(entidad);
     }
 
-
-
-
     public void eliminar(Integer id) {
-        if (!cancionRepository.existsById(id))
-            throw new CancionNoEncontradaException("No existe canción con ID: " + id);
-        cancionRepository.deleteById(id);
+        Cancion cancion = cancionRepository.findById(id)
+                .orElseThrow(() -> new CancionNoEncontradaException("No existe canción con id: " + id));
+        cancion.setActivo(false);
+        cancionRepository.save(cancion);
     }
 
+//    @Transactional(readOnly = true)
+//    public Page<CancionResponseDto> buscarPorTituloPaginado(String titulo, Pageable pageable) {
+//        Page<Cancion> page = (titulo == null || titulo.isEmpty())
+//                ? cancionRepository.findByActivoTrue(pageable)
+//                : cancionRepository.buscarPorTituloActivo(titulo, pageable);
+//        return page.map(cancionMapper::toResponseDto);
+//    }
+
+    @Override
     @Transactional(readOnly = true)
-    public Page<CancionResponseDto> buscarPorTituloPaginado(String titulo, Pageable pageable) {
-        Page<Cancion> page = (titulo == null || titulo.isEmpty())
-                ? cancionRepository.findAll(pageable)
-                : cancionRepository.findByTituloContainingIgnoreCase(titulo, pageable);
+    public Page<CancionResponseDto> buscarPorTituloActivoPaginado(String titulo, Pageable pageable) {
+        Page<Cancion> page = cancionRepository.buscarActivasConArtistaActivo(titulo, pageable);
         return page.map(cancionMapper::toResponseDto);
     }
+
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CancionResponseDto> listarInactivas() {
+        return cancionRepository.findByActivoFalse()
+                .stream()
+                .map(cancionMapper::toResponseDto)
+                .toList();
+    }
+
+    @Override
+    public void reactivarCancion(Integer id) {
+        Cancion cancion = cancionRepository.findById(id)
+                .orElseThrow(() -> new CancionNoEncontradaException("No existe canción con id: " + id));
+        cancion.setActivo(true);
+        cancionRepository.save(cancion);
+    }
+
 }

@@ -48,7 +48,7 @@ public class CancionController {
                                   @RequestParam(value = "page", defaultValue = "0") int page,
                                   Model model) {
         Pageable pageable = PageRequest.of(page, 8);
-        Page<CancionResponseDto> cancionesPage = cancionService.buscarPorTituloPaginado(query, pageable);
+        Page<CancionResponseDto> cancionesPage = cancionService.buscarPorTituloActivoPaginado(query, pageable);
 
         model.addAttribute("cancionesPage", cancionesPage);
         model.addAttribute("currentPage", page);

@@ -29,6 +29,25 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     @Query("SELECT c FROM Cancion c")
     List<Cancion> findAllConArtistaYGenero();
 
+    //Traer canciones activas
+    @Query("SELECT c FROM Cancion c WHERE c.activo = true AND LOWER(c.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))")
+    Page<Cancion> buscarPorTituloActivo(@Param("titulo") String titulo, Pageable pageable);
+
+    @Query("""
+    SELECT c
+    FROM Cancion c
+    WHERE c.activo = true
+      AND c.artista.activo = true
+      AND (:titulo IS NULL OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :titulo, '%')))
+""")
+    Page<Cancion> buscarActivasConArtistaActivo(@Param("titulo") String titulo, Pageable pageable);
+
+    Page<Cancion> findByActivoTrue(Pageable pageable);
+
+    List<Cancion> findByActivoTrue();
+
+    List<Cancion> findByActivoFalse();
+
     // Buscar una canción por ID cargando artista y género
     @EntityGraph(attributePaths = {"artista", "genero"})
     @Query("SELECT c FROM Cancion c WHERE c.id = :id")

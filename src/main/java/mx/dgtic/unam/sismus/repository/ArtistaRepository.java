@@ -35,6 +35,10 @@ public interface ArtistaRepository extends JpaRepository<Artista, Integer> {
     @Query("select a from Artista a")
     List<Artista> findAllConCanciones();
 
+    List<Artista> findByActivoTrue();
+
+    List<Artista> findByActivoFalse();
+
     /* ==========================
        Reportes y estadísticas
        ========================== */

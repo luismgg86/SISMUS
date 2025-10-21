@@ -34,7 +34,7 @@ public class PrincipalController {
                                    Model model) {
 
         Pageable pageable = PageRequest.of(page, 8);
-        Page<CancionResponseDto> cancionesPage = cancionService.buscarPorTituloPaginado(query, pageable);
+        Page<CancionResponseDto> cancionesPage = cancionService.buscarPorTituloActivoPaginado(query, pageable);
         List<ListaResponseDto> playlists = null;
 
         if (userDetails != null) {
@@ -52,7 +52,6 @@ public class PrincipalController {
         return "layout/main";
     }
 
-
     @GetMapping("/playlists")
     public String mostrarPlaylists(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails != null) {
@@ -63,5 +62,4 @@ public class PrincipalController {
         model.addAttribute("contenido", "playlist/listar");
         return "layout/main";
     }
-
 }

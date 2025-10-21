@@ -27,4 +27,7 @@ public class Artista {
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cancion> canciones;
 
+    @Column(nullable = false)
+    private Boolean activo = true;
+
 }

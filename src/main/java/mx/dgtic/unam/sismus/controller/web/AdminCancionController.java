@@ -2,6 +2,7 @@ package mx.dgtic.unam.sismus.controller.web;
 
 import mx.dgtic.unam.sismus.dto.CancionRequestDto;
 import mx.dgtic.unam.sismus.dto.CancionResponseDto;
+import mx.dgtic.unam.sismus.exception.CancionNoEncontradaException;
 import mx.dgtic.unam.sismus.service.ArtistaService;
 import mx.dgtic.unam.sismus.service.GeneroService;
 import mx.dgtic.unam.sismus.service.CancionService;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,7 +30,6 @@ public class AdminCancionController {
         this.generoService = generoService;
     }
 
-    // ✅ Mostrar todas las canciones
     @GetMapping
     public String listarCanciones(Model model) {
         List<CancionResponseDto> canciones = cancionService.listarTodas();
@@ -39,32 +38,62 @@ public class AdminCancionController {
         return "layout/main";
     }
 
-    // ✅ Mostrar formulario para nueva canción
+    @GetMapping("/inactivas")
+    public String listarInactivas(Model model) {
+        List<CancionResponseDto> canciones = cancionService.listarInactivas();
+        model.addAttribute("canciones", canciones);
+        model.addAttribute("contenido", "admin/canciones-inactivas");
+        return "layout/main";
+    }
+
+    @GetMapping("/reactivar/{id}")
+    public String reactivarCancion(@PathVariable Integer id) {
+        cancionService.reactivarCancion(id);
+        return "redirect:/admin/canciones/inactivas";
+    }
+
     @GetMapping("/nueva")
     public String nuevaCancion(Model model) {
         CancionRequestDto dto = new CancionRequestDto();
         dto.setFechaAlta(LocalDate.now());
-
         model.addAttribute("cancion", dto);
         model.addAttribute("artistas", artistaService.listarTodos());
         model.addAttribute("generos", generoService.listarTodos());
         model.addAttribute("contenido", "admin/cancion-form");
-
         return "layout/main";
     }
 
-    // ✅ Guardar canción (DTO + archivo MP3)
     @PostMapping("/guardar")
     public String guardarCancion(@ModelAttribute("cancion") CancionRequestDto dto,
-                                 @RequestParam("archivo") MultipartFile archivo) throws IOException {
-
-        dto.setFechaAlta(LocalDate.now()); // Asignamos fecha si no viene del formulario
-        cancionService.guardarCancionConArchivo(dto, archivo);
-
+                                 @RequestParam(value = "archivo", required = false) MultipartFile archivo,
+                                 @RequestParam(value = "id", required = false) Integer id) throws IOException {
+        dto.setFechaAlta(LocalDate.now());
+        if (id != null) {
+            cancionService.actualizarCancion(id, dto, archivo);
+        } else {
+            cancionService.guardarCancionConArchivo(dto, archivo);
+        }
         return "redirect:/admin/canciones";
     }
 
-    // ✅ Eliminar canción
+    @GetMapping("/editar/{id}")
+    public String editarCancion(@PathVariable Integer id, Model model) {
+        CancionResponseDto existente = cancionService.buscarPorId(id)
+                .orElseThrow(() -> new CancionNoEncontradaException("Canción con id: " + id + " no encontrada"));
+        CancionRequestDto dto = new CancionRequestDto();
+        dto.setTitulo(existente.getTitulo());
+        dto.setDuracion(existente.getDuracion());
+        dto.setAudio(existente.getAudio());
+        dto.setFechaAlta(existente.getFechaAlta());
+        model.addAttribute("modo", "editar");
+        model.addAttribute("id", id);
+        model.addAttribute("cancion", dto);
+        model.addAttribute("artistas", artistaService.listarTodos());
+        model.addAttribute("generos", generoService.listarTodos());
+        model.addAttribute("contenido", "admin/cancion-form");
+        return "layout/main";
+    }
+
     @GetMapping("/eliminar/{id}")
     public String eliminarCancion(@PathVariable Integer id) {
         cancionService.eliminar(id);
