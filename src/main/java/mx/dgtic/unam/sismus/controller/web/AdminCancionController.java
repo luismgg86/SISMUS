@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -66,15 +68,27 @@ public class AdminCancionController {
     @PostMapping("/guardar")
     public String guardarCancion(@ModelAttribute("cancion") CancionRequestDto dto,
                                  @RequestParam(value = "archivo", required = false) MultipartFile archivo,
-                                 @RequestParam(value = "id", required = false) Integer id) throws IOException {
-        dto.setFechaAlta(LocalDate.now());
-        if (id != null) {
-            cancionService.actualizarCancion(id, dto, archivo);
-        } else {
-            cancionService.guardarCancionConArchivo(dto, archivo);
+                                 @RequestParam(value = "id", required = false) Integer id,
+                                 RedirectAttributes redirectAttrs) {
+        try {
+            dto.setFechaAlta(LocalDate.now());
+            if (id != null) {
+                cancionService.actualizarCancion(id, dto, archivo);
+            } else {
+                cancionService.guardarCancionConArchivo(dto, archivo);
+            }
+            redirectAttrs.addFlashAttribute("mensajeExito", "Canción guardada correctamente.");
+        } catch (IllegalArgumentException e) {
+            redirectAttrs.addFlashAttribute("mensajeError", e.getMessage());
+            return "redirect:/admin/canciones/nueva";
+        } catch (IOException e) {
+            redirectAttrs.addFlashAttribute("mensajeError", "Error al guardar el archivo de audio.");
+            return "redirect:/admin/canciones/nueva";
         }
+
         return "redirect:/admin/canciones";
     }
+
 
     @GetMapping("/editar/{id}")
     public String editarCancion(@PathVariable Integer id, Model model) {

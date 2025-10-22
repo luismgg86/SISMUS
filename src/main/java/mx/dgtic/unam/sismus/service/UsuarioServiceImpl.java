@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -71,11 +72,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<UsuarioResponseDto> buscarPorId(Integer id) {
-        return usuarioRepository.findById(id).map(usuarioMapper::toResponseDto);
-    }
-
-    @Transactional(readOnly = true)
     public Optional<UsuarioResponseDto> buscarPorNickname(String nickname) {
         return usuarioRepository.findByNickname(nickname).map(usuarioMapper::toResponseDto);
     }
@@ -96,7 +92,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public void actualizarPassword(Integer idUsuario, String nuevaPassword) {
         var usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(()-> new UsuarioNoEncontradoException("Usuario con Id: " + idUsuario + " no encontrado"));
+                .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario con Id: " + idUsuario + " no encontrado"));
 
         usuario.setPassword(passwordEncoder.encode(nuevaPassword));
         usuarioRepository.save(usuario);
@@ -119,12 +115,45 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public void actualizarRoles(Integer id, Set<String> roles) {
+    /**
+     * ✅ Nuevo método: buscar usuario con sus roles completos (para vista de edición)
+     */
+    @Transactional(readOnly = true)
+    public UsuarioResponseDto buscarPorId(Integer id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado con ID " + id));
+
+        Set<String> roles = usuario.getRoles()
+                .stream()
+                .map(Rol::getNombre)
+                .collect(Collectors.toSet());
+
+        UsuarioResponseDto dto = new UsuarioResponseDto();
+        dto.setId(usuario.getId());
+        dto.setNombreCompleto(usuario.getNombre() + " " + usuario.getApPaterno() + " " + usuario.getApMaterno());
+        dto.setCorreo(usuario.getCorreo());
+        dto.setNickname(usuario.getNickname());
+        dto.setActivo(usuario.getActivo());
+        dto.setRoles(roles);
+
+        return dto;
+    }
+
+    /**
+     * ✅ Ajustado para evitar errores cuando no se seleccionan roles
+     */
+    public void actualizarRoles(Integer id, Set<String> rolesSeleccionados) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID " + id));
 
-        Set<Rol> nuevosRoles = rolRepository.findByNombreIn(roles);
-        usuario.setRoles(nuevosRoles);
+        // Limpia los roles actuales
+        usuario.getRoles().clear();
+
+        if (rolesSeleccionados != null && !rolesSeleccionados.isEmpty()) {
+            Set<Rol> nuevosRoles = rolRepository.findByNombreIn(rolesSeleccionados);
+            usuario.getRoles().addAll(nuevosRoles);
+        }
+
         usuarioRepository.save(usuario);
     }
 }

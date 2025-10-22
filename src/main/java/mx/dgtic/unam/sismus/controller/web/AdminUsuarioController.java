@@ -1,6 +1,7 @@
 package mx.dgtic.unam.sismus.controller.web;
 
 import mx.dgtic.unam.sismus.dto.UsuarioResponseDto;
+import mx.dgtic.unam.sismus.exception.UsuarioNoEncontradoException;
 import mx.dgtic.unam.sismus.service.UsuarioService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,7 +46,7 @@ public class AdminUsuarioController {
                 .stream()
                 .filter(u -> u.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
 
         model.addAttribute("usuario", usuario);
         model.addAttribute("contenido", "admin/usuario-roles");

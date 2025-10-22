@@ -16,16 +16,20 @@ public interface UsuarioService {
     UsuarioResponseDto actualizar(Integer id, UsuarioRegistroDto dto);
     void eliminar(Integer id);
     void cambiarEstado(Integer id, boolean activo);
-    void actualizarRoles(Integer id, Set<String> roles);
 
-    Optional<UsuarioResponseDto> buscarPorId(Integer id);
+    // ✅ Ajustado: ahora devuelve el DTO directamente (lanza excepción si no existe)
+    UsuarioResponseDto buscarPorId(Integer id);
+
+    void actualizarRoles(Integer id, Set<String> rolesSeleccionados);
+
     Optional<UsuarioResponseDto> buscarPorNickname(String nickname);
     List<UsuarioResponseDto> listarTodos();
     Page<UsuarioResponseDto> listarPaginado(String filtro, Pageable pageable);
 
-    //Solo para el cambio de contraseña, no se expone el front
+    // ✅ Solo para backend
     void actualizarPassword(Integer id, String nuevaPassword);
+
+    // ✅ Métodos internos para autenticación
     Optional<Usuario> buscarUsuarioPorNickname(String nickname);
     Optional<Usuario> buscarUsuarioPorCorreo(String correo);
-
 }

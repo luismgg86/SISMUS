@@ -4,6 +4,16 @@
 
         <h2 class="mb-3">Administrar Canciones Activas</h2>
 
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
         <div class="mb-3 d-flex justify-content-between">
             <a class="btn btn-success" th:href="@{/admin/canciones/nueva}">
                 ➕ Agregar nueva canción
@@ -21,6 +31,7 @@
                 <th>Título</th>
                 <th>Artista</th>
                 <th>Género</th>
+                <th>Duración</th>
                 <th>Fecha Alta</th>
                 <th>Acciones</th>
             </tr>
@@ -31,6 +42,7 @@
                 <td th:text="${c.titulo}"></td>
                 <td th:text="${c.artistaNombre}"></td>
                 <td th:text="${c.generoNombre}"></td>
+                <td th:text="${c.duracion != null ? ((c.duracion / 60) + ':' + #numbers.formatInteger(c.duracion % 60, 2)) : '0:00'}"></td>
                 <td th:text="${#temporals.format(c.fechaAlta, 'dd/MM/yyyy')}"></td>
                 <td>
                     <div class="btn-group">

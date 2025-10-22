@@ -19,7 +19,7 @@ public class SecurityConfiguration {
         http
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/bootstrap/**", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/auth", "/register", "/recuperar-password").permitAll()
+                        .requestMatchers("/auth/**", "/register", "/recuperar-password").permitAll()
                         .requestMatchers("/usuario/**").authenticated()
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -28,7 +28,7 @@ public class SecurityConfiguration {
                 .formLogin(login -> login
                         .loginPage("/login")
                         .successHandler(customSuccessHandler())
-                        .failureHandler(customFailureHandler())
+                        .failureUrl("/login?error=true")   // 👈 aquí el cambio
                         .permitAll()
                 )
                 .logout(logout -> logout

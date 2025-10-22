@@ -1,21 +1,48 @@
 <div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment">
-
     <div class="container mt-4 text-white">
+
+        <!-- ✅ Mensajes Flash -->
+        <div th:if="${mensajeExito}"
+             class="alert alert-success alert-dismissible fade show mt-2 shadow-sm"
+             role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${mensajeError}"
+             class="alert alert-danger alert-dismissible fade show mt-2 shadow-sm"
+             role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            <span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
 
         <h2 class="mb-4" th:text="${modo == 'editar'} ? 'Editar Canción' : 'Agregar Nueva Canción'"></h2>
 
-        <form th:action="@{/admin/canciones/guardar}"
+        <form id="formCancion"
+              th:action="@{/admin/canciones/guardar}"
               th:object="${cancion}"
               method="post"
               enctype="multipart/form-data"
-              class="bg-dark p-4 rounded shadow">
+              class="bg-dark p-4 rounded shadow"
+              novalidate>
 
             <input type="hidden" name="id" th:value="${id}" />
 
             <!-- Título -->
             <div class="mb-3">
                 <label class="form-label">Título:</label>
-                <input type="text" th:field="*{titulo}" class="form-control bg-secondary text-white" required>
+                <input type="text"
+                       id="tituloInput"
+                       th:field="*{titulo}"
+                       class="form-control bg-secondary text-white"
+                       placeholder="Ingresa el título de la canción"
+                       maxlength="100"
+                       required>
+                <div class="invalid-feedback">
+                    El título es obligatorio y no puede estar vacío.
+                </div>
             </div>
 
             <!-- Artista -->
@@ -42,6 +69,22 @@
                 </select>
             </div>
 
+            <!-- Duración -->
+            <div class="mb-3">
+                <label class="form-label">Duración (mm:ss):</label>
+                <input type="text"
+                       id="duracionInput"
+                       class="form-control bg-secondary text-white"
+                       placeholder="Ejemplo: 03:45"
+                       pattern="^[0-5]?[0-9]:[0-5][0-9]$"
+                       required
+                       th:value="${cancion.duracion != null ? ((cancion.duracion / 60) + ':' + #numbers.formatInteger(cancion.duracion % 60, 2)) : ''}">
+                <div class="invalid-feedback">
+                    Por favor ingresa una duración válida en formato mm:ss (por ejemplo, 03:45).
+                </div>
+                <input type="hidden" name="duracion" id="duracionSegundos" th:value="${cancion.duracion}">
+            </div>
+
             <!-- Archivo MP3 -->
             <div class="mb-3">
                 <label class="form-label">Archivo MP3:</label>
@@ -55,11 +98,69 @@
             </div>
 
             <!-- Botones -->
-            <button type="submit" class="btn btn-success">
-                <span th:text="${modo == 'editar'} ? 'Actualizar' : 'Guardar'"></span>
-            </button>
-            <a th:href="@{/admin/canciones}" class="btn btn-secondary">Cancelar</a>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success me-2">
+                    <span th:text="${modo == 'editar'} ? 'Actualizar' : 'Guardar'"></span>
+                </button>
+                <a th:href="@{/admin/canciones}" class="btn btn-secondary">Cancelar</a>
+            </div>
         </form>
     </div>
 
+    <script>
+        const form = document.getElementById('formCancion');
+        const tituloInput = document.getElementById('tituloInput');
+        const duracionInput = document.getElementById('duracionInput');
+        const duracionHidden = document.getElementById('duracionSegundos');
+
+        function validarDuracion(valor) {
+            const regex = /^[0-5]?[0-9]:[0-5][0-9]$/;
+            return regex.test(valor);
+        }
+
+        function validarTitulo(valor) {
+            return valor.trim().length > 0;
+        }
+
+        duracionInput?.addEventListener('input', () => {
+            const valor = duracionInput.value.trim();
+            if (validarDuracion(valor)) {
+                duracionInput.classList.remove('is-invalid');
+                const [min, sec] = valor.split(':').map(n => parseInt(n, 10));
+                duracionHidden.value = (min * 60) + sec;
+            } else {
+                duracionInput.classList.add('is-invalid');
+                duracionHidden.value = '';
+            }
+        });
+
+        tituloInput?.addEventListener('input', () => {
+            if (validarTitulo(tituloInput.value)) {
+                tituloInput.classList.remove('is-invalid');
+            } else {
+                tituloInput.classList.add('is-invalid');
+            }
+        });
+
+        form?.addEventListener('submit', (e) => {
+            let valido = true;
+            const valorTitulo = tituloInput.value.trim();
+            const valorDuracion = duracionInput.value.trim();
+
+            if (!validarTitulo(valorTitulo)) {
+                tituloInput.classList.add('is-invalid');
+                valido = false;
+            }
+
+            if (!validarDuracion(valorDuracion)) {
+                duracionInput.classList.add('is-invalid');
+                valido = false;
+            }
+
+            if (!valido) {
+                e.preventDefault();
+                (tituloInput.classList.contains('is-invalid') ? tituloInput : duracionInput).focus();
+            }
+        });
+    </script>
 </div>
