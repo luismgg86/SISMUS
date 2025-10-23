@@ -1,5 +1,6 @@
 package mx.dgtic.unam.sismus.auth.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import mx.dgtic.unam.sismus.dto.UsuarioRegistroDto;
 import mx.dgtic.unam.sismus.service.UsuarioService;
 import org.springframework.stereotype.Controller;
@@ -16,9 +17,15 @@ public class AuthController {
     private final UsuarioService usuarioService;
 
     @GetMapping("/login")
-    public String mostrarLogin() {
-        return "auth/login"; // Ruta corresponda a templates/auth/login.html
+    public String login(HttpServletRequest request, Model model) {
+        Object errorMessage = request.getSession().getAttribute("login_error");
+        if (errorMessage != null) {
+            model.addAttribute("login_error", errorMessage);
+            request.getSession().removeAttribute("login_error");
+        }
+        return "auth/login"; // o la ruta de tu template
     }
+
 
     public AuthController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
@@ -71,7 +78,10 @@ public class AuthController {
         return "redirect:/login";
     }
 
-
+    @GetMapping("/403")
+    public String accessDenied() {
+        return "error/403";
+    }
 
 }
 

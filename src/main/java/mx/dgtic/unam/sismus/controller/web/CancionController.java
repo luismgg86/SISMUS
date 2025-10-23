@@ -47,8 +47,15 @@ public class CancionController {
     public String buscarCanciones(@RequestParam(value = "q", defaultValue = "") String query,
                                   @RequestParam(value = "page", defaultValue = "0") int page,
                                   Model model) {
+
         Pageable pageable = PageRequest.of(page, 8);
-        Page<CancionResponseDto> cancionesPage = cancionService.buscarPorTituloActivoPaginado(query, pageable);
+        Page<CancionResponseDto> cancionesPage;
+
+        if (query.isBlank()) {
+            cancionesPage = cancionService.buscarPorTituloActivoPaginado("", pageable);
+        } else {
+            cancionesPage = cancionService.buscarPorTituloArtistaGeneroActivoPaginado(query, pageable);
+        }
 
         model.addAttribute("cancionesPage", cancionesPage);
         model.addAttribute("currentPage", page);
@@ -57,6 +64,7 @@ public class CancionController {
 
         return "cancion/listar :: fragment";
     }
+
 
     @GetMapping("/{id}/descargar")
     public ResponseEntity<Resource> descargarCancion(@PathVariable Integer id, HttpServletRequest request) {

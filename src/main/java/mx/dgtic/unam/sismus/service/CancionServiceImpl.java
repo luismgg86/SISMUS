@@ -142,6 +142,14 @@ public class CancionServiceImpl implements CancionService {
         cancionRepository.save(entidad);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CancionResponseDto> buscarPorTituloArtistaGeneroActivoPaginado(String query, Pageable pageable) {
+        Page<Cancion> page = cancionRepository.buscarPorTituloArtistaGeneroActivoPaginado(query, pageable);
+        return page.map(cancionMapper::toResponseDto);
+    }
+
+
     public void eliminar(Integer id) {
         Cancion cancion = cancionRepository.findById(id)
                 .orElseThrow(() -> new CancionNoEncontradaException("No existe canción con id: " + id));

@@ -15,11 +15,10 @@ public interface CancionService {
     List<CancionResponseDto> listarTodas();
     List<CancionResponseDto> listarInactivas();
     Optional<CancionResponseDto> buscarPorId(Integer id);
-    //CancionResponseDto guardar(CancionRequestDto dto);
     void actualizarCancion(Integer id, CancionRequestDto dto, MultipartFile archivo) throws IOException;
     void guardarCancionConArchivo(CancionRequestDto dto, MultipartFile archivo) throws IOException;
     void eliminar(Integer id);
     void reactivarCancion(Integer id);
-    //Page<CancionResponseDto> buscarPorTituloPaginado(String titulo, Pageable pageable);
     Page<CancionResponseDto> buscarPorTituloActivoPaginado(String titulo, Pageable pageable);
+    Page<CancionResponseDto> buscarPorTituloArtistaGeneroActivoPaginado(String query, Pageable pageable);
 }

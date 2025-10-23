@@ -1,6 +1,5 @@
 package mx.dgtic.unam.sismus.security.service;
 
-import mx.dgtic.unam.sismus.model.Usuario;
 import mx.dgtic.unam.sismus.repository.UsuarioRepository;
 import mx.dgtic.unam.sismus.security.model.UserDetailsImpl;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,9 +20,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String nickname) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByNickname(nickname)
+        return usuarioRepository.findByNickname(nickname)
+                .map(UserDetailsImpl::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + nickname));
-
-        return new UserDetailsImpl(usuario);
     }
+
+
 }

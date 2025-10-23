@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Acceso denegado - Sismus</title>
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/base.css}" rel="stylesheet">
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1c1c1c, #000);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: bold;
+            color: #ff4d4d;
+        }
+
+        .error-message {
+            font-size: 1.5rem;
+            color: #bbb;
+            margin-bottom: 1rem;
+        }
+
+        .btn-home {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-home:hover {
+            transform: scale(1.05);
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="text-center">
+    <div class="error-code">403</div>
+    <div class="error-message">No tienes permisos para acceder a esta página.</div>
+    <a th:href="@{/}" class="btn-home">Volver al inicio</a>
+</div>
+</body>
+</html>

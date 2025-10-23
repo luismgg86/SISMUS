@@ -14,5 +14,6 @@ public class ListaResponseDto {
     private String nombre;
     private LocalDate fechaCreacion;
     private String usuarioNickname;
+    private Integer totalCancionesActivas;
     private List<CancionResponseDto> canciones;
 }

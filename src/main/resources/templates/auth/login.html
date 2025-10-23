@@ -32,8 +32,8 @@
 
         <button type="submit" class="btn btn-instagram w-100 mb-3">Iniciar sesión</button>
 
-        <div th:if="${param.error}" class="alert alert-danger text-center">
-            Usuario o contraseña inválidos.
+        <div th:if="${login_error}" class="alert alert-danger text-center">
+            <span th:text="${login_error}"></span>
         </div>
         <div th:if="${param.logout}" class="alert alert-info text-center">
             Sesión cerrada correctamente.
