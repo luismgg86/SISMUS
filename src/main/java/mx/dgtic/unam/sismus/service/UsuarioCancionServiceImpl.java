@@ -1,5 +1,6 @@
 package mx.dgtic.unam.sismus.service;
 
+import mx.dgtic.unam.sismus.dto.CancionResponseDto;
 import mx.dgtic.unam.sismus.dto.UsuarioCancionDto;
 import mx.dgtic.unam.sismus.exception.CancionNoEncontradaException;
 import mx.dgtic.unam.sismus.exception.UsuarioNoEncontradoException;
@@ -74,6 +75,14 @@ public class UsuarioCancionServiceImpl implements UsuarioCancionService {
     @Transactional(readOnly = true)
     public boolean existeDescarga(Integer usuarioId, Integer cancionId) {
         return usuarioCancionRepository.existsByUsuarioIdAndCancionId(usuarioId, cancionId);
+    }
+
+    @Override
+    @Transactional
+    public void registrarDescargas(Integer usuarioId, List<CancionResponseDto> canciones) {
+        for (CancionResponseDto c : canciones) {
+            registrarDescarga(usuarioId, c.getId());
+        }
     }
 
 

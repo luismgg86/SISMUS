@@ -28,6 +28,6 @@ public class Artista {
     private List<Cancion> canciones;
 
     @Column(nullable = false)
-    private Boolean activo = true;
+    private boolean activo = true;
 
 }

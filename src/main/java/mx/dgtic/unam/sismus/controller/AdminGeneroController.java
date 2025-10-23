@@ -1,4 +1,4 @@
-package mx.dgtic.unam.sismus.controller.web;
+package mx.dgtic.unam.sismus.controller;
 
 import mx.dgtic.unam.sismus.dto.GeneroDto;
 import mx.dgtic.unam.sismus.exception.EntidadDuplicadaException;

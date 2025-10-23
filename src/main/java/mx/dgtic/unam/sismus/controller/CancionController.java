@@ -1,4 +1,4 @@
-package mx.dgtic.unam.sismus.controller.web;
+package mx.dgtic.unam.sismus.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import mx.dgtic.unam.sismus.dto.CancionResponseDto;
@@ -25,7 +25,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/canciones")
@@ -80,7 +79,7 @@ public class CancionController {
             });
         }
 
-        Path rutaArchivo = Paths.get("src/main/resources/static" + cancion.getAudio());
+        Path rutaArchivo = Paths.get("src/main/resources/static/" + cancion.getAudio());
         try {
             if (!Files.exists(rutaArchivo)) return ResponseEntity.notFound().build();
             Resource recurso = new UrlResource(rutaArchivo.toUri());

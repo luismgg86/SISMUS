@@ -1,4 +1,4 @@
-package mx.dgtic.unam.sismus.controller.web;
+package mx.dgtic.unam.sismus.controller;
 
 import mx.dgtic.unam.sismus.dto.CancionResponseDto;
 import mx.dgtic.unam.sismus.dto.ListaResponseDto;
@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -31,12 +32,14 @@ public class PrincipalController {
     public String mostrarPrincipal(@RequestParam(value = "page", defaultValue = "0") int page,
                                    @RequestParam(value = "q", defaultValue = "") String query,
                                    @AuthenticationPrincipal UserDetails userDetails,
+                                   @ModelAttribute("exito") String exito,
+                                   @ModelAttribute("error") String error,
                                    Model model) {
 
         Pageable pageable = PageRequest.of(page, 8);
-        Page<CancionResponseDto> cancionesPage = cancionService.buscarPorTituloActivoPaginado(query, pageable);
-        List<ListaResponseDto> playlists = null;
+        var cancionesPage = cancionService.buscarPorTituloActivoPaginado(query, pageable);
 
+        List<ListaResponseDto> playlists = null;
         if (userDetails != null) {
             String nickname = userDetails.getUsername();
             playlists = listaService.obtenerListasPorUsuario(nickname);
@@ -47,6 +50,8 @@ public class PrincipalController {
         model.addAttribute("totalPages", cancionesPage.getTotalPages());
         model.addAttribute("query", query);
         model.addAttribute("playlists", playlists);
+        model.addAttribute("exito", exito);
+        model.addAttribute("error", error);
         model.addAttribute("contenido", "cancion/listar");
 
         return "layout/main";

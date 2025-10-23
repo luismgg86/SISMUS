@@ -1,0 +1,36 @@
+<!-- templates/admin/reportes.html -->
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment" class="text-white">
+
+    <!-- 🔹 Metadatos y estilos -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/base.css}" rel="stylesheet">
+    <link th:href="@{/css/layout.css}" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+
+    <!-- 🔹 Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">📊 Reportes del Sistema</h3>
+    </div>
+
+    <!-- 🔹 Lista de reportes -->
+    <div class="list-group shadow">
+        <a th:href="@{/admin/reportes/canciones}" class="list-group-item list-group-item-action bg-dark text-white border-secondary">
+            🎵 Reporte de Canciones Registradas
+        </a>
+
+        <a th:href="@{/admin/reportes/listas}" class="list-group-item list-group-item-action bg-dark text-white border-secondary">
+            📂 Reporte de Listas de Canciones por Usuario
+        </a>
+
+        <a th:href="@{/admin/reportes/actividad}" class="list-group-item list-group-item-action bg-dark text-white border-secondary">
+            👥 Reporte de Actividad de Usuarios
+        </a>
+    </div>
+
+    <!-- 🔹 Scripts -->
+    <script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</div>

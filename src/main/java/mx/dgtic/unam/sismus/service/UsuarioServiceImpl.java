@@ -40,12 +40,29 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDto registrar(UsuarioRegistroDto dto) {
+
+        if (usuarioRepository.findByCorreo(dto.getCorreo()).isPresent()) {
+            throw new RuntimeException("Ya existe una cuenta con ese correo electrónico.");
+        }
+
+        if (usuarioRepository.findByNickname(dto.getNickname()).isPresent()) {
+            throw new RuntimeException("El nombre de usuario (nickname) ya está en uso.");
+        }
+
         Rol rolUser = rolRepository.findByNombre("USER")
                 .orElseThrow(() -> new RuntimeException("No existe el rol USER"));
 
         Usuario usuario = usuarioMapper.toEntity(dto, rolUser);
+
+        if (dto.getApMaterno() == null) {
+            dto.setApMaterno("");
+        }
+
+        usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
+
         return usuarioMapper.toResponseDto(usuarioRepository.save(usuario));
     }
+
 
     @Override
     public UsuarioResponseDto actualizar(Integer id, UsuarioRegistroDto dto) {
@@ -133,7 +150,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         dto.setNombreCompleto(usuario.getNombre() + " " + usuario.getApPaterno() + " " + usuario.getApMaterno());
         dto.setCorreo(usuario.getCorreo());
         dto.setNickname(usuario.getNickname());
-        dto.setActivo(usuario.getActivo());
+        dto.setActivo(usuario.isActivo());
         dto.setRoles(roles);
 
         return dto;

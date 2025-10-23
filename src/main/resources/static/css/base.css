@@ -29,6 +29,7 @@ a:hover {
   transform: scale(1.03);
 }
 
+/* ====== ALERTA LEGADA (mantiene compatibilidad con alert-fixed) ====== */
 .alert-fixed {
   position: fixed;
   top: 20px;

@@ -3,6 +3,7 @@ package mx.dgtic.unam.sismus.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,10 @@ public class Usuario {
     private String password;
 
     @Column(nullable = false)
-    private Boolean activo = true;
+    private boolean activo = true;
+
+    @Column(name = "ultimo_acceso")
+    private LocalDateTime ultimoAcceso;
 
     @ToString.Exclude @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -55,4 +59,5 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "rol_id")
     )
     private Set<Rol> roles = new HashSet<>();
+
 }

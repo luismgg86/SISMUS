@@ -39,7 +39,7 @@ public class Cancion {
     private Genero genero;
 
     @Column(nullable = false)
-    private Boolean activo = true;
+    private boolean activo = true;
 
     @ToString.Exclude @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "cancion", cascade = CascadeType.ALL, orphanRemoval = true)

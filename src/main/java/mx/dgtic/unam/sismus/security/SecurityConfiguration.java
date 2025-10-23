@@ -14,6 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import java.time.LocalDateTime;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -39,27 +41,26 @@ public class SecurityConfiguration {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
-        authProvider.setHideUserNotFoundExceptions(false); // 👈 permite distinguir usuario no encontrado
+        authProvider.setHideUserNotFoundExceptions(false);
         return authProvider;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authenticationProvider(authenticationProvider()) // 👈 usa nuestro proveedor personalizado
+                .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/bootstrap/**", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/auth/**", "/register", "/recuperar-password").permitAll()
-                        .requestMatchers("/usuario/**").authenticated()
+                        .requestMatchers("/login", "/register", "/recuperar-password").permitAll()
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .successHandler(customSuccessHandler())
-                        .failureHandler(customFailureHandler()) // 👈 manejador personalizado
                         .permitAll()
+                        .failureHandler(customFailureHandler())
+                        .successHandler(customSuccessHandler())
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -68,11 +69,6 @@ public class SecurityConfiguration {
                         .clearAuthentication(true)
                         .permitAll()
                 )
-                .exceptionHandling(ex -> ex
-                        .accessDeniedHandler((req, res, excep) -> {
-                            res.sendError(HttpServletResponse.SC_FORBIDDEN);
-                        })
-                )
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
 
         return http.build();
@@ -80,7 +76,14 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthenticationSuccessHandler customSuccessHandler() {
-        return (request, response, authentication) -> response.sendRedirect("/");
+        return (request, response, authentication) -> {
+            String nickname = authentication.getName();
+            usuarioRepository.findByNickname(nickname).ifPresent(usuario -> {
+                usuario.setUltimoAcceso(LocalDateTime.now());
+                usuarioRepository.save(usuario);
+            });
+            response.sendRedirect("/");
+        };
     }
 
     @Bean
@@ -92,6 +95,8 @@ public class SecurityConfiguration {
                 errorMessage = "Usuario no encontrado.";
             } else if (exception instanceof org.springframework.security.authentication.BadCredentialsException) {
                 errorMessage = "Contraseña incorrecta.";
+            } else if (exception instanceof org.springframework.security.authentication.DisabledException) {
+                errorMessage = "Usuario inactivo. Contacte al administrador."; // 👈 mensaje personalizado
             } else {
                 errorMessage = "Error al iniciar sesión.";
             }

@@ -28,7 +28,7 @@ public class UsuarioMapper {
         dto.setNombreCompleto(usuario.getNombre() + " " + usuario.getApPaterno());
         dto.setCorreo(usuario.getCorreo());
         dto.setNickname(usuario.getNickname());
-        dto.setActivo(usuario.getActivo());
+        dto.setActivo(usuario.isActivo());
 
         // Convertimos Set<Rol> → Set<String>
         Set<String> nombresRoles = usuario.getRoles()

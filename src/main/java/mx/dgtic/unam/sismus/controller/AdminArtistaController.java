@@ -1,4 +1,4 @@
-package mx.dgtic.unam.sismus.controller.web;
+package mx.dgtic.unam.sismus.controller;
 
 import mx.dgtic.unam.sismus.dto.ArtistaDto;
 import mx.dgtic.unam.sismus.exception.ArtistaNoEncontradoException;

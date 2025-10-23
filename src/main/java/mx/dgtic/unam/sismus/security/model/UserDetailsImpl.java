@@ -20,23 +20,42 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return usuario.getRoles().stream()
-                .map(Rol::getNombre) // "USER", "ADMIN"
+                .map(Rol::getNombre)
                 .map(rol -> new SimpleGrantedAuthority("ROLE_" + rol))
                 .collect(Collectors.toSet());
     }
 
     @Override
     public String getPassword() {
-        return usuario.getPassword(); // ✅ mapea al campo password de tu entidad
+        return usuario.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return usuario.getNickname(); // ✅ login con nickname
+        return usuario.getNickname();
     }
 
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return usuario.isActivo();
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
 }

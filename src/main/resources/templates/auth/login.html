@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:thymeleaf="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Iniciar sesión - Sismus</title>
@@ -32,11 +32,17 @@
 
         <button type="submit" class="btn btn-instagram w-100 mb-3">Iniciar sesión</button>
 
-        <div th:if="${login_error}" class="alert alert-danger text-center">
+        <!-- 🔹 Mensajes dinámicos -->
+        <div th:if="${login_error}" class="alert alert-danger text-center mt-3">
             <span th:text="${login_error}"></span>
         </div>
-        <div th:if="${param.logout}" class="alert alert-info text-center">
-            Sesión cerrada correctamente.
+
+        <div th:if="${login_success}" class="alert alert-success text-center mt-3">
+            <span th:text="${login_success}"></span>
+        </div>
+
+        <div th:if="${logout_message}" class="alert alert-info text-center mt-3">
+            <span th:text="${logout_message}"></span>
         </div>
     </form>
 
@@ -53,7 +59,6 @@
             Recuperar aquí
         </a>
     </p>
-
 
 </div>
 

@@ -2,7 +2,7 @@
 $(document).ready(function () {
     let selectedSongId = null;
 
-    //Menú contextual (click derecho en canción)
+    // Menú contextual (click derecho en canción)
     $(document).on("contextmenu", ".song-card", function (e) {
         e.preventDefault();
         selectedSongId = $(this).data("id");
@@ -16,7 +16,7 @@ $(document).ready(function () {
         $("#contextMenu").fadeOut(200);
     });
 
-    //Abrir modal de selección de playlist
+    // Abrir modal de selección de playlist
     $("#addToPlaylistOption").click(function (e) {
         e.preventDefault();
         $("#selectedSongId").val(selectedSongId);
@@ -24,7 +24,7 @@ $(document).ready(function () {
         $("#contextMenu").hide();
     });
 
-    //Agregar canción a playlist
+    // Agregar canción a playlist (AJAX)
     $("#addToPlaylistForm").submit(function (e) {
         e.preventDefault();
 
@@ -55,7 +55,7 @@ $(document).ready(function () {
         });
     });
 
-    //Búsqueda dinámica
+    // Búsqueda dinámica
     function cargarCanciones(query, page) {
         $.ajax({
             url: '/canciones/buscar',
@@ -91,5 +91,4 @@ $(document).ready(function () {
 
         $("#contextMenu").hide();
     });
-
 });

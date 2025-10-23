@@ -12,21 +12,28 @@ import java.util.List;
 
 public interface CancionRepository extends JpaRepository<Cancion, Integer> {
 
+    // ❌ No se usa actualmente (no llamado desde el servicio)
     List<Cancion> findByArtista_NombreContainingIgnoreCase(String nombreArtista);
 
+    // ❌ No se usa actualmente
     List<Cancion> findByGenero_Clave(String claveGenero);
 
+    // ❌ No se usa actualmente
     List<Cancion> findByListas_Id(Integer listaId);
 
+    // ❌ No se usa actualmente
     Page<Cancion> findByTituloContainingIgnoreCase(String titulo, Pageable pageable);
 
+    // ❌ No se usa actualmente
     @EntityGraph(attributePaths = {"artista", "genero"})
     @Query("SELECT c FROM Cancion c")
     List<Cancion> findAllConArtistaYGenero();
 
+    // ❌ No se usa actualmente (reemplazado por buscarActivasConArtistaActivo)
     @Query("SELECT c FROM Cancion c WHERE c.activo = true AND LOWER(c.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))")
     Page<Cancion> buscarPorTituloActivo(@Param("titulo") String titulo, Pageable pageable);
 
+    // ✅ Usado en CancionServiceImpl.buscarPorTituloActivoPaginado()
     @Query("""
         SELECT c
         FROM Cancion c
@@ -36,16 +43,21 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     """)
     Page<Cancion> buscarActivasConArtistaActivo(@Param("titulo") String titulo, Pageable pageable);
 
+    // ✅ Usado indirectamente por listarTodas()
     Page<Cancion> findByActivoTrue(Pageable pageable);
 
+    // ✅ Usado en listarTodas()
     List<Cancion> findByActivoTrue();
 
+    // ✅ Usado en listarInactivas()
     List<Cancion> findByActivoFalse();
 
+    // ❌ No se usa actualmente (para obtener una canción con joins)
     @EntityGraph(attributePaths = {"artista", "genero"})
     @Query("SELECT c FROM Cancion c WHERE c.id = :id")
     Cancion findByIdConRelaciones(@Param("id") Integer id);
 
+    // ❌ No se usa actualmente (nativa: búsqueda directa por artista)
     @Query(value = """
       select c.*
       from cancion c
@@ -54,6 +66,7 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     """, nativeQuery = true)
     List<Cancion> buscarPorNombreArtista(@Param("nombre") String nombre);
 
+    // ❌ No se usa actualmente
     @Query("""
         select c
         from Cancion c
@@ -62,6 +75,7 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     """)
     List<Cancion> buscarPorClaveGenero(@Param("clave") String clave);
 
+    // ❌ No se usa actualmente
     @Query(value = """
         select c.*
         from cancion c
@@ -73,6 +87,7 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     List<Cancion> nativaPorArtistaYGenero(@Param("claveArtista") String claveArtista,
                                           @Param("claveGenero") String claveGenero);
 
+    // ❌ No se usa actualmente
     @Query("""
         select c
         from Cancion c
@@ -80,6 +95,7 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     """)
     List<Cancion> cancionesSinLista();
 
+    // ❌ No se usa actualmente (reporte)
     @Query("""
         select g.nombre as genero, count(c) as total
         from Cancion c
@@ -89,6 +105,7 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     """)
     List<Object[]> reporteConteoPorGenero();
 
+    // ❌ No se usa actualmente (reporte)
     @Query("""
         select c.titulo AS titulo, COUNT(u) AS totalDescargas
         from Cancion c
@@ -98,6 +115,7 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     """)
     List<Object[]> reporteCancionesMasDescargadas();
 
+    // ❌ No se usa actualmente
     @Query("""
         select c
         from Cancion c
@@ -105,6 +123,7 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     """)
     List<Cancion> cancionesConMinimoDescargas(@Param("minimo") int minimo);
 
+    // ❌ No se usa actualmente
     @Query("""
         select c
         from Cancion c
@@ -115,11 +134,12 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     List<Cancion> buscarPorArtistaYTitulo(@Param("artista") String artista,
                                           @Param("titulo") String titulo);
 
-    // 🔍 NUEVO MÉTODO: búsqueda por título, artista o género (paginada y solo activas)
+    // ✅ USADO: búsqueda principal del buscador dinámico (por título, artista o género)
     @Query("""
         SELECT c
         FROM Cancion c
         WHERE c.activo = true
+          AND c.artista.activo = true
           AND (
               LOWER(c.titulo) LIKE LOWER(CONCAT('%', :query, '%'))
               OR LOWER(c.artista.nombre) LIKE LOWER(CONCAT('%', :query, '%'))

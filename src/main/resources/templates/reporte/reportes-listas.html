@@ -1,0 +1,34 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment" class="text-white">
+
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/base.css}" rel="stylesheet">
+    <link th:href="@{/css/layout.css}" rel="stylesheet">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">📂 Reporte de Listas de Canciones por Usuario</h3>
+        <a th:href="@{/admin/reportes}" class="btn btn-outline-light btn-sm">⬅ Volver</a>
+    </div>
+
+    <table class="table table-dark table-striped table-hover shadow">
+        <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Lista</th>
+            <th>Canciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="l : ${listas}">
+            <td th:text="${l.usuario}"></td>
+            <td th:text="${l.nombre}"></td>
+            <td th:text="${l.numCanciones}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</div>

@@ -16,20 +16,37 @@ public class AuthController {
 
     private final UsuarioService usuarioService;
 
+    public AuthController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
+
     @GetMapping("/login")
-    public String login(HttpServletRequest request, Model model) {
+    public String login(
+            @RequestParam(required = false) String success,
+            @RequestParam(required = false) String logout,
+            HttpServletRequest request,
+            Model model) {
+
+        // Error de autenticación
         Object errorMessage = request.getSession().getAttribute("login_error");
         if (errorMessage != null) {
             model.addAttribute("login_error", errorMessage);
             request.getSession().removeAttribute("login_error");
         }
-        return "auth/login"; // o la ruta de tu template
+
+        // Mensaje de registro exitoso
+        if (success != null) {
+            model.addAttribute("login_success", "Cuenta creada correctamente. Inicia sesión.");
+        }
+
+        // Mensaje de logout
+        if (logout != null) {
+            model.addAttribute("logout_message", "Sesión cerrada correctamente.");
+        }
+
+        return "auth/login";
     }
 
-
-    public AuthController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
 
     @GetMapping("/register")
     public String mostrarFormularioRegistro(Model model) {
@@ -42,8 +59,13 @@ public class AuthController {
         try {
             usuarioService.registrar(dto);
             return "redirect:/login?success";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("usuario", dto);
+            return "auth/register";
         } catch (Exception e) {
             model.addAttribute("error", "No se pudo registrar: " + e.getMessage());
+            model.addAttribute("usuario", dto);
             return "auth/register";
         }
     }
@@ -75,13 +97,11 @@ public class AuthController {
         usuarioService.actualizarPassword(usuario.get().getId(), nuevaPassword);
 
         redirectAttributes.addFlashAttribute("success", "Contraseña actualizada. Inicia sesión.");
-        return "redirect:/login";
+        return "redirect:/login?success=true";
     }
 
     @GetMapping("/403")
     public String accessDenied() {
         return "error/403";
     }
-
 }
-
