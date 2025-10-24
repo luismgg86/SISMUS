@@ -1,0 +1,28 @@
+/* ======= FIX: Campos de texto visibles en modo oscuro ======= */
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+textarea {
+  background-color: #1e1e1e !important;
+  color: #fff !important;
+  border: 2px solid #DD2A7B !important;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #aaa !important;
+  opacity: 0.8;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #F58529 !important; /* tono cálido tipo Instagram */
+  outline: none !important;
+  box-shadow: 0 0 6px rgba(221, 42, 123, 0.5);
+  background-color: #242424 !important;
+}

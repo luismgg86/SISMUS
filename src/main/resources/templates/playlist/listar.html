@@ -9,7 +9,6 @@
     <link th:href="@{/css/layout.css}" rel="stylesheet">
     <link th:href="@{/css/playlists.css}" rel="stylesheet">
 
-    <!-- Encabezado -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Tus Playlists</h3>
         <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#crearPlaylistModal">
@@ -24,7 +23,6 @@
         No tienes playlists creadas todavía.
     </p>
 
-    <!--Listado de playlists -->
     <div class="row g-3" th:if="${!#lists.isEmpty(playlists)}">
         <div class="col-6 col-md-3" th:each="playlist : ${playlists}">
             <div class="card h-100 playlist-card"
@@ -56,7 +54,6 @@
         </div>
     </div>
 
-    <!-- Modal Crear Playlist -->
     <div class="modal fade" id="crearPlaylistModal" tabindex="-1" aria-labelledby="crearPlaylistModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark text-white">
@@ -85,12 +82,10 @@
         </div>
     </div>
 
-    <!-- Menú contextual -->
     <div id="playlistContextMenu">
         <a href="#" id="deletePlaylistAction">🗑 Eliminar Playlist</a>
     </div>
 
-    <!-- Modal Confirmación -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1"
          aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -110,7 +105,6 @@
         </div>
     </div>
 
-    <!-- 🔹 Scripts -->
     <script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
     <script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/playlists.js}"></script>

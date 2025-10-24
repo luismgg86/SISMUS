@@ -1,0 +1,98 @@
+<!-- templates/admin/reportes.html -->
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment" class="reportes-bg text-white">
+
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/base.css}" rel="stylesheet">
+    <link th:href="@{/css/layout.css}" rel="stylesheet">
+    <link th:href="@{/css/reportes.css}" rel="stylesheet">
+
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-2">📊 Reportes del Sistema</h2>
+        <p class="text-light opacity-75">Genera y descarga los reportes en formato PDF o Excel</p>
+        <hr class="gradient-divider mx-auto my-4">
+    </div>
+
+    <div class="alert-container">
+        <div th:if="${error}" class="alert alert-danger text-center fade show">
+            <span th:text="${error}"></span>
+        </div>
+        <div th:if="${exito}" class="alert alert-success text-center fade show">
+            <span th:text="${exito}"></span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+
+            <div class="col-12 col-md-4">
+                <div class="card reporte-card h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-3">🎵 Canciones Registradas</h5>
+                            <p class="text-light opacity-75 small mb-4">
+                                Listado completo de canciones activas, con su artista y género.
+                            </p>
+                        </div>
+                        <div>
+                            <a th:href="@{/admin/reportes/pdf/canciones}" class="btn btn-instagram btn-sm me-2">
+                                <i class="bi bi-file-earmark-pdf"></i> PDF
+                            </a>
+                            <a th:href="@{/admin/reportes/excel/canciones}" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="card reporte-card h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-3">📚 Listas por Usuario</h5>
+                            <p class="text-light opacity-75 small mb-4">
+                                Muestra cuántas listas creó cada usuario y cuántas canciones contienen.
+                            </p>
+                        </div>
+                        <div>
+                            <a th:href="@{/admin/reportes/pdf/listas}" class="btn btn-instagram btn-sm me-2">
+                                <i class="bi bi-file-earmark-pdf"></i> PDF
+                            </a>
+                            <a th:href="@{/admin/reportes/excel/listas}" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="card reporte-card h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-3">👤 Actividad de Usuarios</h5>
+                            <p class="text-light opacity-75 small mb-4">
+                                Descargas, listas creadas y última fecha de acceso.
+                            </p>
+                        </div>
+                        <div>
+                            <a th:href="@{/admin/reportes/pdf/actividad}" class="btn btn-instagram btn-sm me-2">
+                                <i class="bi bi-file-earmark-pdf"></i> PDF
+                            </a>
+                            <a th:href="@{/admin/reportes/excel/actividad}" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</div>

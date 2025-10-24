@@ -69,6 +69,20 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     """)
     List<Object[]> reporteTopUsuariosPorListas();
 
+    @Query("""
+    SELECT u.nickname AS usuario,
+           COUNT(DISTINCT d) AS totalDescargas,
+           COUNT(DISTINCT l) AS totalListas,
+           u.ultimoAcceso AS ultimoAcceso
+    FROM Usuario u
+    LEFT JOIN u.cancionesDescargadas d
+    LEFT JOIN u.listas l
+    GROUP BY u.nickname, u.ultimoAcceso
+    ORDER BY totalDescargas DESC
+    """)
+    List<Object[]> reporteActividadUsuarios();
+
+
     // Top usuarios con más descargas
     @Query("""
     SELECT u.nickname AS usuario, COUNT(d) AS totalDescargas
