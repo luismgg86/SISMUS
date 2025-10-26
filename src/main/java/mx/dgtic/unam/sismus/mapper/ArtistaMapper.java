@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
+/**
+ * Mapper para conversión entre entidades Artista y sus DTOs.
+ */
 @Component
 public class ArtistaMapper {
 

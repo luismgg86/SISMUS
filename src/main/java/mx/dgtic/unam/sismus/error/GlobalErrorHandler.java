@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-@ControllerAdvice
+@ControllerAdvice(basePackages = "mx.dgtic.unam.sismus.controller.web")
 public class GlobalErrorHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
@@ -24,7 +24,6 @@ public class GlobalErrorHandler {
     @ExceptionHandler(Exception.class)
     public Object handleInternalError(Exception ex, WebRequest request, Model model) {
         if (isAjaxRequest(request)) {
-            // Aquí devolvemos un mensaje limpio para el $.ajax(error: function)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error interno: " + ex.getMessage());
         }

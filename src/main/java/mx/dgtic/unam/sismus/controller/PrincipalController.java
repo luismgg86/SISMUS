@@ -1,19 +1,15 @@
 package mx.dgtic.unam.sismus.controller;
 
-import mx.dgtic.unam.sismus.dto.CancionResponseDto;
 import mx.dgtic.unam.sismus.dto.ListaResponseDto;
 import mx.dgtic.unam.sismus.service.CancionService;
 import mx.dgtic.unam.sismus.service.ListaService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,16 +31,13 @@ public class PrincipalController {
                                    @ModelAttribute("exito") String exito,
                                    @ModelAttribute("error") String error,
                                    Model model) {
-
         Pageable pageable = PageRequest.of(page, 8);
         var cancionesPage = cancionService.buscarPorTituloActivoPaginado(query, pageable);
-
         List<ListaResponseDto> playlists = null;
         if (userDetails != null) {
             String nickname = userDetails.getUsername();
             playlists = listaService.obtenerListasPorUsuario(nickname);
         }
-
         model.addAttribute("cancionesPage", cancionesPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", cancionesPage.getTotalPages());
@@ -53,7 +46,6 @@ public class PrincipalController {
         model.addAttribute("exito", exito);
         model.addAttribute("error", error);
         model.addAttribute("contenido", "cancion/listar");
-
         return "layout/main";
     }
 

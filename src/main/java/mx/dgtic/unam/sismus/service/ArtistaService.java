@@ -9,29 +9,19 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ArtistaService {
-
-    // CRUD básico
     List<ArtistaDto> listarTodos();
-    Optional<ArtistaDto> buscarPorId(Integer id);
-    ArtistaDto guardar(ArtistaDto artistaDto);
-    void eliminar(Integer id);
     List<ArtistaDto> listarActivos();
     List<ArtistaDto> listarInactivos();
+    Optional<ArtistaDto> buscarPorId(Integer id);
+    ArtistaDto guardar(ArtistaDto artistaDto);
+    void actualizar(Integer id, ArtistaDto dto);
+    void eliminar(Integer id);
     void activar(Integer id);
-
-    // Búsquedas
+    void reactivar(Integer id);
     Optional<ArtistaDto> buscarPorClave(String clave);
     List<ArtistaDto> buscarPorNombre(String nombre);
     Page<ArtistaDto> buscarPorNombrePaginado(String nombre, Pageable pageable);
-
-    // Relaciones
     Optional<ArtistaDetalleDto> detalleConCancionesPorClave(String clave);
     List<ArtistaDetalleDto> listarConCanciones();
-
-    // Reportes
     List<ArtistaDto> artistasSinCanciones();
-
-    // 🔹 Administración
-    void actualizar(Integer id, ArtistaDto dto);
-    void reactivar(Integer id);
 }

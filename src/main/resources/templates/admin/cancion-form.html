@@ -1,7 +1,7 @@
 <div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment" class="admin-bg">
-<div class="container mt-4 text-white">
+    <div class="container mt-4 text-white">
 
-        <!-- ✅ Mensajes Flash -->
+        <!-- Mensajes Flash -->
         <div th:if="${mensajeExito}"
              class="alert alert-success alert-dismissible fade show mt-2 shadow-sm"
              role="alert">
@@ -49,10 +49,11 @@
             <div class="mb-3">
                 <label class="form-label">Artista:</label>
                 <select th:field="*{artistaId}" class="form-select bg-secondary text-white" required>
-                    <option value="" disabled selected>Selecciona un artista</option>
+                    <option value="" disabled>Selecciona un artista</option>
                     <option th:each="art : ${artistas}"
                             th:value="${art.id}"
-                            th:text="${art.nombre}">
+                            th:text="${art.nombre}"
+                            th:selected="${art.id == cancion.artistaId}">
                     </option>
                 </select>
             </div>
@@ -61,10 +62,11 @@
             <div class="mb-3">
                 <label class="form-label">Género:</label>
                 <select th:field="*{generoId}" class="form-select bg-secondary text-white" required>
-                    <option value="" disabled selected>Selecciona un género</option>
+                    <option value="" disabled>Selecciona un género</option>
                     <option th:each="gen : ${generos}"
                             th:value="${gen.id}"
-                            th:text="${gen.nombre}">
+                            th:text="${gen.nombre}"
+                            th:selected="${gen.id == cancion.generoId}">
                     </option>
                 </select>
             </div>
@@ -107,21 +109,25 @@
         </form>
     </div>
 
+    <!-- Script de validaciones -->
     <script>
         const form = document.getElementById('formCancion');
         const tituloInput = document.getElementById('tituloInput');
         const duracionInput = document.getElementById('duracionInput');
         const duracionHidden = document.getElementById('duracionSegundos');
 
+        // Valida formato mm:ss
         function validarDuracion(valor) {
             const regex = /^[0-5]?[0-9]:[0-5][0-9]$/;
             return regex.test(valor);
         }
 
+        // Valida que el título no esté vacío
         function validarTitulo(valor) {
             return valor.trim().length > 0;
         }
 
+        // Actualiza duración en segundos
         duracionInput?.addEventListener('input', () => {
             const valor = duracionInput.value.trim();
             if (validarDuracion(valor)) {
@@ -134,6 +140,7 @@
             }
         });
 
+        // Validación de título
         tituloInput?.addEventListener('input', () => {
             if (validarTitulo(tituloInput.value)) {
                 tituloInput.classList.remove('is-invalid');
@@ -142,6 +149,7 @@
             }
         });
 
+        // Validación general del formulario
         form?.addEventListener('submit', (e) => {
             let valido = true;
             const valorTitulo = tituloInput.value.trim();

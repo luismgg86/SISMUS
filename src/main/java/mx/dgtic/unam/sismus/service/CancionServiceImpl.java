@@ -44,51 +44,34 @@ public class CancionServiceImpl implements CancionService {
         this.cancionMapper = cancionMapper;
     }
 
-    @Override
     @Transactional(readOnly = true)
     public List<CancionResponseDto> listarTodas() {
-        return cancionRepository.findByActivoTrue()
-                .stream()
-                .map(cancionMapper::toResponseDto)
-                .toList();
+        return cancionRepository.findByActivoTrue().stream().map(cancionMapper::toResponseDto).toList();
     }
 
-    @Override
     @Transactional(readOnly = true)
     public List<CancionResponseDto> listarInactivas() {
-        return cancionRepository.findByActivoFalse()
-                .stream()
-                .map(cancionMapper::toResponseDto)
-                .toList();
+        return cancionRepository.findByActivoFalse().stream().map(cancionMapper::toResponseDto).toList();
     }
 
-    @Override
     @Transactional(readOnly = true)
     public Optional<CancionResponseDto> buscarPorId(Integer id) {
-        return cancionRepository.findById(id)
-                .filter(Cancion::isActivo)
-                .map(cancionMapper::toResponseDto);
+        return cancionRepository.findById(id).filter(Cancion::isActivo).map(cancionMapper::toResponseDto);
     }
 
-    @Override
     @Transactional(readOnly = true)
     public Page<CancionResponseDto> buscarPorTituloActivoPaginado(String titulo, Pageable pageable) {
-        Page<Cancion> page = cancionRepository.buscarActivasConArtistaActivo(titulo, pageable);
-        return page.map(cancionMapper::toResponseDto);
+        return cancionRepository.buscarActivasConArtistaActivo(titulo, pageable).map(cancionMapper::toResponseDto);
     }
 
-    @Override
     @Transactional(readOnly = true)
     public Page<CancionResponseDto> buscarPorTituloArtistaGeneroActivoPaginado(String query, Pageable pageable) {
-        Page<Cancion> page = cancionRepository.buscarPorTituloArtistaGeneroActivoPaginado(query, pageable);
-        return page.map(cancionMapper::toResponseDto);
+        return cancionRepository.buscarPorTituloArtistaGeneroActivoPaginado(query, pageable).map(cancionMapper::toResponseDto);
     }
 
-    @Override
     public void guardarCancionConArchivo(CancionRequestDto dto, MultipartFile archivo) throws IOException {
-        if (archivo == null || archivo.isEmpty()) {
+        if (archivo == null || archivo.isEmpty())
             throw new IllegalArgumentException("Debes seleccionar un archivo de audio para crear una nueva canción.");
-        }
 
         Artista artista = artistaRepository.findById(dto.getArtistaId())
                 .orElseThrow(() -> new ArtistaNoEncontradoException("No existe artista con id: " + dto.getArtistaId()));
@@ -102,7 +85,6 @@ public class CancionServiceImpl implements CancionService {
         String extension = nombreOriginal != null && nombreOriginal.contains(".")
                 ? nombreOriginal.substring(nombreOriginal.lastIndexOf('.') + 1)
                 : "";
-
         String nombreArchivo = UUID.randomUUID() + (extension.isEmpty() ? "" : "." + extension);
         Path destino = carpeta.resolve(nombreArchivo);
         Files.copy(archivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
@@ -115,7 +97,6 @@ public class CancionServiceImpl implements CancionService {
         cancionRepository.save(entidad);
     }
 
-    @Override
     public void actualizarCancion(Integer id, CancionRequestDto dto, MultipartFile archivo) throws IOException {
         Cancion cancion = cancionRepository.findById(id)
                 .orElseThrow(() -> new CancionNoEncontradaException("No existe canción con id: " + id));
@@ -135,23 +116,19 @@ public class CancionServiceImpl implements CancionService {
         if (archivo != null && !archivo.isEmpty()) {
             Path carpeta = Paths.get("src/main/resources/static/audios");
             if (!Files.exists(carpeta)) Files.createDirectories(carpeta);
-
             String nombreOriginal = archivo.getOriginalFilename();
             String extension = nombreOriginal != null && nombreOriginal.contains(".")
                     ? nombreOriginal.substring(nombreOriginal.lastIndexOf('.') + 1)
                     : "";
-
             String nombreArchivo = UUID.randomUUID() + (extension.isEmpty() ? "" : "." + extension);
             Path destino = carpeta.resolve(nombreArchivo);
             Files.copy(archivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
-
             cancion.setAudio("/audios/" + nombreArchivo);
         }
 
         cancionRepository.save(cancion);
     }
 
-    @Override
     public void eliminar(Integer id) {
         Cancion cancion = cancionRepository.findById(id)
                 .orElseThrow(() -> new CancionNoEncontradaException("No existe canción con id: " + id));
@@ -159,7 +136,6 @@ public class CancionServiceImpl implements CancionService {
         cancionRepository.save(cancion);
     }
 
-    @Override
     public void reactivarCancion(Integer id) {
         Cancion cancion = cancionRepository.findById(id)
                 .orElseThrow(() -> new CancionNoEncontradaException("No existe canción con id: " + id));

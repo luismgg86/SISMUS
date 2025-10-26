@@ -27,10 +27,8 @@
 
                 <a th:href="@{/}">Inicio</a>
                 <a th:href="@{/usuario/perfil}">Perfil</a>
-                <a th:href="@{/buscar}">Buscar</a>
                 <a th:href="@{/playlists}">Tus Playlists</a>
                 <hr class="text-secondary">
-                <a th:href="@{/favoritos}">Tus Favoritos</a>
 
                 <!-- Sección exclusiva para administradores -->
                 <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
@@ -53,7 +51,7 @@
         </div>
 
         <!-- Contenido dinámico -->
-        <div class="col-12 col-md-10">
+        <div class="col-12 col-md-10 main-content">
             <div class="content-area">
                 <div th:replace="~{${contenido} :: fragment}"></div>
             </div>

@@ -16,6 +16,11 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 import java.time.LocalDateTime;
 
+/**
+ * Configuración central de seguridad para SISMUS.
+ * Define el flujo de autenticación, las rutas publicas y protegidas,
+ * y el manejo de login/logout con redirecciones personalizadas.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -26,42 +31,54 @@ public class SecurityConfiguration {
         this.usuarioRepository = usuarioRepository;
     }
 
+    // Datos del usuario
     @Bean
     public UserDetailsServiceImpl userDetailsService() {
         return new UserDetailsServiceImpl(usuarioRepository);
     }
 
+    // Codificador de contraseña
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    // Proveedor de autenticacion
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        authProvider.setHideUserNotFoundExceptions(false);
-        return authProvider;
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService());
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setHideUserNotFoundExceptions(false);
+        return provider;
     }
 
+    // Configuracion del filtro de seguridad
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authenticationProvider(authenticationProvider())
+
+        http.authenticationProvider(authenticationProvider())
+
+                // Autorizaciones
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/bootstrap/**", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                        .requestMatchers(
+                                "/bootstrap/**", "/css/**", "/js/**", "/images/**", "/favicon.ico"
+                        ).permitAll()
                         .requestMatchers("/login", "/register", "/recuperar-password").permitAll()
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+
+                // Login
                 .formLogin(login -> login
                         .loginPage("/login")
                         .permitAll()
-                        .failureHandler(customFailureHandler())
                         .successHandler(customSuccessHandler())
+                        .failureHandler(customFailureHandler())
                 )
+
+                // Logout
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
@@ -69,11 +86,14 @@ public class SecurityConfiguration {
                         .clearAuthentication(true)
                         .permitAll()
                 )
+
+                // CSRF
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
 
         return http.build();
     }
 
+    // Exito login
     @Bean
     public AuthenticationSuccessHandler customSuccessHandler() {
         return (request, response, authentication) -> {
@@ -86,6 +106,7 @@ public class SecurityConfiguration {
         };
     }
 
+    //Error login
     @Bean
     public AuthenticationFailureHandler customFailureHandler() {
         return (request, response, exception) -> {
@@ -96,7 +117,7 @@ public class SecurityConfiguration {
             } else if (exception instanceof org.springframework.security.authentication.BadCredentialsException) {
                 errorMessage = "Contraseña incorrecta.";
             } else if (exception instanceof org.springframework.security.authentication.DisabledException) {
-                errorMessage = "Usuario inactivo. Contacte al administrador."; // 👈 mensaje personalizado
+                errorMessage = "Usuario inactivo. Contacte al administrador.";
             } else {
                 errorMessage = "Error al iniciar sesión.";
             }

@@ -6,7 +6,6 @@ import mx.dgtic.unam.sismus.dto.UsuarioCancionDto;
 import java.util.List;
 
 public interface UsuarioCancionService {
-
     UsuarioCancionDto registrarDescarga(Integer usuarioId, Integer cancionId);
     void registrarDescargas(Integer usuarioId, List<CancionResponseDto> canciones);
     List<UsuarioCancionDto> obtenerDescargasPorUsuario(Integer usuarioId);

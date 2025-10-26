@@ -47,7 +47,6 @@ public class AdminUsuarioController {
                 .filter(u -> u.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
-
         model.addAttribute("usuario", usuario);
         model.addAttribute("contenido", "admin/usuario-roles");
         return "layout/main";
@@ -59,4 +58,3 @@ public class AdminUsuarioController {
         return "redirect:/admin/usuarios";
     }
 }
-

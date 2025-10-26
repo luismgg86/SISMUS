@@ -5,6 +5,9 @@ import mx.dgtic.unam.sismus.model.Genero;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper para conversión entre Genero y GeneroDto.
+ */
 @Component
 public class GeneroMapper {
 
@@ -14,8 +17,8 @@ public class GeneroMapper {
         this.modelMapper = modelMapper;
     }
 
-    public GeneroDto toDto(Genero genero) {
-        return modelMapper.map(genero, GeneroDto.class);
+    public GeneroDto toDto(Genero entity) {
+        return modelMapper.map(entity, GeneroDto.class);
     }
 
     public Genero toEntity(GeneroDto dto) {

@@ -13,49 +13,19 @@ import java.util.Optional;
 
 public interface GeneroRepository extends JpaRepository<Genero, Integer> {
 
-    /* ==========================
-       Búsquedas básicas
-       ========================== */
-
-    // Buscar por clave exacta
     Optional<Genero> findByClave(String clave);
-
-    // Buscar por clave sin importar mayúsculas
-    List<Genero> findByClaveIgnoreCase(String clave);
-
-    // Buscar por nombre parcial
     List<Genero> findByNombreContainingIgnoreCase(String nombre);
-
-    // Búsqueda paginada (ideal para catálogos)
     Page<Genero> findByNombreContainingIgnoreCase(String nombre, Pageable pageable);
-
-    // Ordenar alfabéticamente
+    boolean existsByClave(String clave);
     List<Genero> findAllByOrderByNombreAsc();
 
-    boolean existsByClave(String clave);
-
-    /* ==========================
-       Optimización para relaciones
-       ========================== */
-
-    // Traer género y todas sus canciones
     @EntityGraph(attributePaths = "canciones")
     @Query("SELECT g FROM Genero g WHERE g.clave = :clave")
     Optional<Genero> detalleConCancionesPorClave(@Param("clave") String clave);
 
-    /* ==========================
-       Reportes y métricas
-       ========================== */
-
-    // Géneros sin canciones registradas
-    @Query("""
-        SELECT g
-        FROM Genero g
-        WHERE g.canciones IS EMPTY
-    """)
+    @Query("SELECT g FROM Genero g WHERE g.canciones IS EMPTY")
     List<Genero> generosSinCanciones();
 
-    // Conteo de canciones por género
     @Query("""
         SELECT g.nombre AS genero, COUNT(c) AS totalCanciones
         FROM Genero g
@@ -64,17 +34,4 @@ public interface GeneroRepository extends JpaRepository<Genero, Integer> {
         ORDER BY totalCanciones DESC
     """)
     List<Object[]> reporteConteoCancionesPorGenero();
-
-    /* ==========================
-       Búsquedas avanzadas
-       ========================== */
-
-    // Buscar género que contenga una canción con cierto título
-    @Query("""
-        SELECT DISTINCT g
-        FROM Genero g
-        JOIN g.canciones c
-        WHERE LOWER(c.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))
-    """)
-    List<Genero> buscarPorTituloDeCancion(@Param("titulo") String titulo);
 }

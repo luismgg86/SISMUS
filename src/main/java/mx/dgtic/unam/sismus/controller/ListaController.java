@@ -2,15 +2,15 @@ package mx.dgtic.unam.sismus.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import mx.dgtic.unam.sismus.dto.*;
-import mx.dgtic.unam.sismus.exception.UsuarioNoEncontradoException;
-import mx.dgtic.unam.sismus.service.*;
+import mx.dgtic.unam.sismus.dto.CancionResponseDto;
+import mx.dgtic.unam.sismus.dto.ListaResponseDto;
+import mx.dgtic.unam.sismus.service.CancionService;
+import mx.dgtic.unam.sismus.service.ListaService;
+import mx.dgtic.unam.sismus.service.UsuarioService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -38,20 +38,15 @@ public class ListaController {
     @GetMapping("/{id}")
     public String verPlaylist(@PathVariable Integer id, Model model) {
         ListaResponseDto playlist = listaService.obtenerConRelaciones(id);
-
         if (playlist != null && playlist.getCanciones() != null) {
             List<Integer> idsActivos = obtenerIdsCancionesActivas();
-            playlist.setCanciones(
-                    playlist.getCanciones().stream()
-                            .filter(c -> idsActivos.contains(c.getId()))
-                            .toList()
-            );
+            playlist.setCanciones(playlist.getCanciones().stream()
+                    .filter(c -> idsActivos.contains(c.getId()))
+                    .toList());
         }
-
         Pageable pageable = PageRequest.of(0, 1000);
         List<CancionResponseDto> cancionesDisponibles =
                 cancionService.buscarPorTituloActivoPaginado(null, pageable).getContent();
-
         model.addAttribute("playlist", playlist);
         model.addAttribute("cancionesDisponibles", cancionesDisponibles);
         model.addAttribute("contenido", "playlist/detalle");
@@ -59,18 +54,16 @@ public class ListaController {
     }
 
     @PostMapping("/{playlistId}/agregar-cancion")
-    public String agregarCancionDesdeListado(
-            @PathVariable Integer playlistId, // 👈 ahora viene de la URL
-            @RequestParam Integer cancionId,
-            RedirectAttributes redirectAttributes,
-            HttpServletRequest request) {
+    public String agregarCancionDesdeListado(@PathVariable Integer playlistId,
+                                             @RequestParam Integer cancionId,
+                                             RedirectAttributes redirectAttrs,
+                                             HttpServletRequest request) {
         try {
             listaService.agregarCancionALista(playlistId, cancionId);
-            redirectAttributes.addFlashAttribute("exito", "Canción agregada correctamente a la playlist.");
+            redirectAttrs.addFlashAttribute("exito", "Canción agregada correctamente a la playlist.");
         } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttrs.addFlashAttribute("error", ex.getMessage());
         }
-
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/");
     }
@@ -78,33 +71,30 @@ public class ListaController {
     @PostMapping("/{id}/eliminar-cancion")
     public String eliminarCancionDePlaylist(@PathVariable Integer id,
                                             @RequestParam Integer cancionId,
-                                            RedirectAttributes redirectAttributes) {
+                                            RedirectAttributes redirectAttrs) {
         try {
             listaService.eliminarCancionDeLista(id, cancionId);
-            redirectAttributes.addFlashAttribute("exito", "Canción eliminada correctamente.");
+            redirectAttrs.addFlashAttribute("exito", "Canción eliminada correctamente.");
         } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttrs.addFlashAttribute("error", ex.getMessage());
         }
         return "redirect:/playlists/" + id;
     }
 
     @PostMapping("/{id}/descargar")
     public String descargarPlaylist(@PathVariable Integer id,
-                                    RedirectAttributes redirectAttributes,
+                                    RedirectAttributes redirectAttrs,
                                     HttpServletResponse response) throws IOException {
-
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String nickname = (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName()))
                 ? auth.getName()
                 : null;
-
         try {
             listaService.descargarPlaylistComoZip(id, nickname, response);
         } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttrs.addFlashAttribute("error", ex.getMessage());
             return "redirect:/playlists";
         }
-
         return null;
     }
 

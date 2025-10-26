@@ -85,28 +85,32 @@ public class AdminCancionController {
             redirectAttrs.addFlashAttribute("mensajeError", "Error al guardar el archivo de audio.");
             return "redirect:/admin/canciones/nueva";
         }
-
         return "redirect:/admin/canciones";
     }
-
 
     @GetMapping("/editar/{id}")
     public String editarCancion(@PathVariable Integer id, Model model) {
         CancionResponseDto existente = cancionService.buscarPorId(id)
                 .orElseThrow(() -> new CancionNoEncontradaException("Canción con id: " + id + " no encontrada"));
+
         CancionRequestDto dto = new CancionRequestDto();
         dto.setTitulo(existente.getTitulo());
         dto.setDuracion(existente.getDuracion());
         dto.setAudio(existente.getAudio());
         dto.setFechaAlta(existente.getFechaAlta());
+        dto.setArtistaId(existente.getArtistaId());
+        dto.setGeneroId(existente.getGeneroId());
+
         model.addAttribute("modo", "editar");
         model.addAttribute("id", id);
         model.addAttribute("cancion", dto);
         model.addAttribute("artistas", artistaService.listarTodos());
         model.addAttribute("generos", generoService.listarTodos());
         model.addAttribute("contenido", "admin/cancion-form");
+
         return "layout/main";
     }
+
 
     @GetMapping("/eliminar/{id}")
     public String eliminarCancion(@PathVariable Integer id) {

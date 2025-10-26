@@ -5,6 +5,9 @@ import mx.dgtic.unam.sismus.model.ListaCancion;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper para conversión entre ListaCancion y su DTO.
+ */
 @Component
 public class ListaCancionMapper {
 

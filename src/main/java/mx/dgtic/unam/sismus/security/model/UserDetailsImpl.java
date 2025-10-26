@@ -9,6 +9,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+/**
+ * Implementación personalizada de {@link UserDetails}
+ * que adapta la entidad {@link Usuario} a los requerimientos de Spring Security.
+ */
 public class UserDetailsImpl implements UserDetails {
 
     private final Usuario usuario;
@@ -21,7 +25,7 @@ public class UserDetailsImpl implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return usuario.getRoles().stream()
                 .map(Rol::getNombre)
-                .map(rol -> new SimpleGrantedAuthority("ROLE_" + rol))
+                .map(nombre -> new SimpleGrantedAuthority("ROLE_" + nombre))
                 .collect(Collectors.toSet());
     }
 
@@ -37,17 +41,17 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return true; // No se maneja expiracion de cueta
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return true; // No se maneja bloqueo de cuenta
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return true; // No se maneja expiracion de credenciales
     }
 
     @Override

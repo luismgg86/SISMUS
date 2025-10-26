@@ -33,7 +33,6 @@ public class AdminReporteController {
         var bis = pdfService.generarReportePdf(tipo);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename=reporte_" + tipo + ".pdf");
-
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.APPLICATION_PDF)
@@ -46,7 +45,6 @@ public class AdminReporteController {
         var bis = excelService.generarReporteExcel(tipo);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=reporte_" + tipo + ".xlsx");
-
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)

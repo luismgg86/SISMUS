@@ -15,7 +15,9 @@ public class CancionResponseDto {
     private Integer duracion;
     private Boolean activo;
     private LocalDate fechaAlta;
+    private Integer artistaId;
     private String artistaNombre;
+    private Integer generoId;
     private String generoNombre;
     private LocalDate fechaAgregada;
 }

@@ -12,9 +12,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -22,9 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 @Controller
 @RequestMapping("/canciones")
@@ -46,24 +42,16 @@ public class CancionController {
     public String buscarCanciones(@RequestParam(value = "q", defaultValue = "") String query,
                                   @RequestParam(value = "page", defaultValue = "0") int page,
                                   Model model) {
-
         Pageable pageable = PageRequest.of(page, 8);
-        Page<CancionResponseDto> cancionesPage;
-
-        if (query.isBlank()) {
-            cancionesPage = cancionService.buscarPorTituloActivoPaginado("", pageable);
-        } else {
-            cancionesPage = cancionService.buscarPorTituloArtistaGeneroActivoPaginado(query, pageable);
-        }
-
+        Page<CancionResponseDto> cancionesPage = query.isBlank()
+                ? cancionService.buscarPorTituloActivoPaginado("", pageable)
+                : cancionService.buscarPorTituloArtistaGeneroActivoPaginado(query, pageable);
         model.addAttribute("cancionesPage", cancionesPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", cancionesPage.getTotalPages());
         model.addAttribute("query", query);
-
         return "cancion/listar :: fragment";
     }
-
 
     @GetMapping("/{id}/descargar")
     public ResponseEntity<Resource> descargarCancion(@PathVariable Integer id, HttpServletRequest request) {
@@ -83,12 +71,19 @@ public class CancionController {
         try {
             if (!Files.exists(rutaArchivo)) return ResponseEntity.notFound().build();
             Resource recurso = new UrlResource(rutaArchivo.toUri());
+
+            String nombreDescarga = cancion.getTitulo()
+                    .replaceAll("[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s\\-]", "")
+                    .replaceAll("\\s+", "_") + ".mp3";
+
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + nombreDescarga + "\"")
                     .body(recurso);
+
         } catch (MalformedURLException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
+
 }

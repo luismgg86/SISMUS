@@ -1,102 +1,84 @@
-// detallePlaylist.js — versión compatible con Thymeleaf fragmentos
-document.addEventListener('DOMContentLoaded', () => {
+// detallePlaylist.js — se encarga de manejar las canciones dentro de una playlist
+document.addEventListener("DOMContentLoaded", () => {
+
     const meta = document.querySelector('meta[name="playlist-id"]');
-    if (!meta) return; // seguridad
+    if (!meta) return; // si no hay meta, salimos
     const playlistId = meta.content;
 
     registrarEventosContextuales(playlistId);
 
-    // Agregar canción con AJAX
-    const btnAgregar = document.getElementById('btnAgregarCancion');
+    // Para el boton de agregar cancion
+    const btnAgregar = document.getElementById("btnAgregarCancion");
     if (btnAgregar) {
-        btnAgregar.addEventListener('click', e => {
+        btnAgregar.addEventListener("click", e => {
             e.preventDefault();
-            const cancionId = document.getElementById('selectCancion').value;
-            if (!cancionId) return mostrarAlerta('error', 'Selecciona una canción.');
+            const cancionId = document.getElementById("selectCancion").value;
+            if (!cancionId) return showAlert("Selecciona una canción.", "warning");
 
-            fetch(`/api/playlists/${playlistId}/agregar-cancion?cancionId=${cancionId}`, {
-                method: 'POST'
-            })
+            // Se manda la peticion al controlador
+            fetch(`/api/playlists/${playlistId}/agregar-cancion?cancionId=${cancionId}`, { method: "POST" })
                 .then(res => {
-                    if (res.status === 409) throw new Error('La canción ya está en la playlist.');
-                    if (!res.ok) throw new Error('Error al agregar la canción.');
+                    if (res.status === 409) throw new Error("La canción ya está en la playlist.");
+                    if (!res.ok) throw new Error("Error al agregar la canción.");
                     return res.text();
                 })
                 .then(msg => {
-                    mostrarAlerta('exito', msg);
+                    showAlert(msg, "success");
                     recargarTablaCanciones(playlistId);
                 })
-                .catch(err => mostrarAlerta('error', err.message));
+                .catch(err => showAlert(err.message, "danger"));
         });
     }
 });
 
-function mostrarAlerta(tipo, mensaje) {
-    const alertaExito = document.getElementById('alertaExito');
-    const alertaError = document.getElementById('alertaError');
-    const mensajeError = document.getElementById('mensajeError');
-
-    alertaExito.style.display = 'none';
-    alertaError.style.display = 'none';
-
-    if (tipo === 'exito') {
-        alertaExito.textContent = mensaje;
-        alertaExito.style.display = 'block';
-        setTimeout(() => alertaExito.style.display = 'none', 2000);
-    } else {
-        mensajeError.textContent = mensaje;
-        alertaError.style.display = 'block';
-        setTimeout(() => alertaError.style.display = 'none', 3000);
-    }
-}
-
+// Para recargar la tablas de canciones despues de agregar
 function recargarTablaCanciones(playlistId) {
     fetch(`/playlists/${playlistId}/fragmento`)
         .then(res => res.text())
         .then(html => {
-            document.querySelector('#tbodyCanciones').innerHTML = html;
+            document.querySelector("#tbodyCanciones").innerHTML = html;
             registrarEventosContextuales(playlistId);
-            const totalSpan = document.getElementById('totalCanciones');
-            totalSpan.textContent = document.querySelectorAll('.cancion-row').length;
+            document.getElementById("totalCanciones").textContent =
+                document.querySelectorAll(".cancion-row").length;
         })
-        .catch(err => console.error('Error al recargar canciones:', err));
+        .catch(err => console.error("Error al recargar canciones:", err));
 }
 
 function registrarEventosContextuales(playlistId) {
-    const contextMenu = document.getElementById('contextMenu');
-    const btnEliminarCancion = document.getElementById('btnEliminarCancion');
+    const contextMenu = document.getElementById("contextMenu");
+    const btnEliminar = document.getElementById("btnEliminarCancion");
     let cancionSeleccionada = null;
 
-    document.querySelectorAll('.cancion-row').forEach(row => {
-        row.addEventListener('contextmenu', e => {
+    // Click derecho sobre una fila de cancion
+    document.querySelectorAll(".cancion-row").forEach(row => {
+        row.addEventListener("contextmenu", e => {
             e.preventDefault();
-            e.stopPropagation();
-
             cancionSeleccionada = row.dataset.id;
-            contextMenu.style.top = e.pageY + 'px';
-            contextMenu.style.left = e.pageX + 'px';
-            contextMenu.style.display = 'block';
+            contextMenu.style.top = e.pageY + "px";
+            contextMenu.style.left = e.pageX + "px";
+            contextMenu.style.display = "block";
         });
     });
 
-    document.addEventListener('click', () => contextMenu.style.display = 'none');
+    // Si se hace click fuera se cierra
+    document.addEventListener("click", () => contextMenu.style.display = "none");
 
-    if (btnEliminarCancion) {
-        btnEliminarCancion.onclick = () => {
+    // Para eliminar la cancion
+    if (btnEliminar) {
+        btnEliminar.onclick = () => {
             if (!cancionSeleccionada) return;
-
             fetch(`/api/playlists/${playlistId}/eliminar-cancion?cancionId=${cancionSeleccionada}`, {
-                method: 'DELETE'
+                method: "DELETE"
             })
                 .then(res => {
-                    if (!res.ok) throw new Error('Error al eliminar la canción.');
+                    if (!res.ok) throw new Error("Error al eliminar la canción.");
                     return res.text();
                 })
                 .then(msg => {
-                    mostrarAlerta('exito', msg);
+                    showAlert(msg, "success");
                     recargarTablaCanciones(playlistId);
                 })
-                .catch(err => mostrarAlerta('error', err.message));
+                .catch(err => showAlert(err.message, "danger"));
         };
     }
 }

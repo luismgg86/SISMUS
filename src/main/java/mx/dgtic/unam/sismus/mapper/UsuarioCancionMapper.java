@@ -5,6 +5,9 @@ import mx.dgtic.unam.sismus.model.UsuarioCancion;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper para conversión entre UsuarioCancion y su DTO.
+ */
 @Component
 public class UsuarioCancionMapper {
 

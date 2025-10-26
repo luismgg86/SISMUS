@@ -11,6 +11,10 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Mapper para conversion entre Usuario y sus DTOs
+ * Incluye codificación de contraseñas y mapeo de roles
+ */
 @Component
 public class UsuarioMapper {
 
@@ -22,31 +26,26 @@ public class UsuarioMapper {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UsuarioResponseDto toResponseDto(Usuario usuario) {
+    public UsuarioResponseDto toResponseDto(Usuario entity) {
         UsuarioResponseDto dto = new UsuarioResponseDto();
-        dto.setId(usuario.getId());
-        dto.setNombreCompleto(usuario.getNombre() + " " + usuario.getApPaterno());
-        dto.setCorreo(usuario.getCorreo());
-        dto.setNickname(usuario.getNickname());
-        dto.setActivo(usuario.isActivo());
+        dto.setId(entity.getId());
+        dto.setNombreCompleto(entity.getNombre() + " " + entity.getApPaterno());
+        dto.setCorreo(entity.getCorreo());
+        dto.setNickname(entity.getNickname());
+        dto.setActivo(entity.isActivo());
 
-        // Convertimos Set<Rol> → Set<String>
-        Set<String> nombresRoles = usuario.getRoles()
-                .stream()
-                .map(Rol::getNombre) // "USER", "ADMIN"
+        Set<String> roles = entity.getRoles().stream()
+                .map(Rol::getNombre)
                 .collect(Collectors.toSet());
-        dto.setRoles(nombresRoles);
+        dto.setRoles(roles);
 
         return dto;
     }
 
     public Usuario toEntity(UsuarioRegistroDto dto, Rol rolPorDefecto) {
-        Usuario usuario = modelMapper.map(dto, Usuario.class);
-
-        usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-        usuario.setRoles(Set.of(rolPorDefecto));
-
-        return usuario;
+        Usuario entity = modelMapper.map(dto, Usuario.class);
+        entity.setPassword(passwordEncoder.encode(dto.getPassword()));
+        entity.setRoles(Set.of(rolPorDefecto));
+        return entity;
     }
 }

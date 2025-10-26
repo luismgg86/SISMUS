@@ -6,8 +6,6 @@ import mx.dgtic.unam.sismus.exception.GeneroNoEncontradoException;
 import mx.dgtic.unam.sismus.mapper.GeneroMapper;
 import mx.dgtic.unam.sismus.model.Genero;
 import mx.dgtic.unam.sismus.repository.GeneroRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +26,7 @@ public class GeneroServiceImpl implements GeneroService {
 
     @Transactional(readOnly = true)
     public List<GeneroDto> listarTodos() {
-        return generoRepository.findAllByOrderByNombreAsc()
-                .stream()
-                .map(generoMapper::toDto)
-                .toList();
+        return generoRepository.findAllByOrderByNombreAsc().stream().map(generoMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
@@ -50,37 +45,13 @@ public class GeneroServiceImpl implements GeneroService {
         generoRepository.deleteById(id);
     }
 
-    @Override
     public void actualizar(Integer id, GeneroDto dto) {
         Genero existente = generoRepository.findById(id)
                 .orElseThrow(() -> new GeneroNoEncontradoException("Género con ID " + id + " no encontrado"));
-
-        if (!existente.getClave().equals(dto.getClave()) &&
-                generoRepository.existsByClave(dto.getClave())) {
+        if (!existente.getClave().equals(dto.getClave()) && generoRepository.existsByClave(dto.getClave()))
             throw new EntidadDuplicadaException("Ya existe un género con la clave: " + dto.getClave());
-        }
-
         existente.setClave(dto.getClave());
         existente.setNombre(dto.getNombre());
         generoRepository.save(existente);
     }
-
-    @Transactional(readOnly = true)
-    public Optional<GeneroDto> buscarPorClave(String clave) {
-        return generoRepository.findByClave(clave).map(generoMapper::toDto);
-    }
-
-    @Transactional(readOnly = true)
-    public List<GeneroDto> buscarPorNombre(String nombre) {
-        return generoRepository.findByNombreContainingIgnoreCase(nombre)
-                .stream().map(generoMapper::toDto).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public Page<GeneroDto> buscarPorNombrePaginado(String nombre, Pageable pageable) {
-        return generoRepository.findByNombreContainingIgnoreCase(nombre, pageable)
-                .map(generoMapper::toDto);
-    }
-
-
 }

@@ -1,94 +1,84 @@
-// canciones.js - manejo de canciones y menú contextual
-$(document).ready(function () {
+// canciones.js — buscador, menu contextual, descargas y agregar canciones a playlists
+$(function () {
+
     let selectedSongId = null;
 
-    // Menú contextual (click derecho en canción)
+    // Click derecho en una cancion -> muestra menu contextual
     $(document).on("contextmenu", ".song-card", function (e) {
         e.preventDefault();
         selectedSongId = $(this).data("id");
-
-        $("#contextMenu")
-            .css({ top: e.pageY + "px", left: e.pageX + "px" })
-            .fadeIn(200);
+        $("#contextMenu").css({ top: e.pageY, left: e.pageX }).fadeIn(200);
     });
 
-    $(document).click(function () {
-        $("#contextMenu").fadeOut(200);
-    });
+    // Clic fuera -> se cierra el menu
+    $(document).click(() => $("#contextMenu").fadeOut(200));
 
-    // Abrir modal de selección de playlist
-    $("#addToPlaylistOption").click(function (e) {
+    // Abre modal para agregar canciona la playlist
+    $("#addToPlaylistOption").click(e => {
         e.preventDefault();
         $("#selectedSongId").val(selectedSongId);
         $("#selectPlaylistModal").modal("show");
         $("#contextMenu").hide();
     });
 
-    // Agregar canción a playlist (AJAX)
+    // Para agregar canciona playlist
     $("#addToPlaylistForm").submit(function (e) {
         e.preventDefault();
 
         const playlistId = $("#playlistSelect").val();
         const songId = $("#selectedSongId").val();
 
-        if (!playlistId) {
-            alert("Por favor selecciona una playlist.");
-            return;
-        }
+        if (!playlistId) return showAlert("Selecciona una playlist.", "warning");
 
         $.ajax({
-            url: '/api/playlists/' + playlistId + '/agregar-cancion',
-            type: 'POST',
+            url: `/api/playlists/${playlistId}/agregar-cancion`,
+            type: "POST",
             data: { cancionId: songId },
-            success: function () {
+            success: () => {
                 $("#selectPlaylistModal").modal("hide");
-                $("#successAlert").fadeIn().delay(2000).fadeOut();
+                showAlert("Canción agregada correctamente.", "success");
             },
-            error: function (xhr) {
+            error: xhr => {
                 $("#selectPlaylistModal").modal("hide");
-                if (xhr.status === 409) {
-                    $("#errorAlert").fadeIn().delay(2000).fadeOut();
-                } else {
-                    alert("Hubo un error al agregar la canción.");
-                }
+                if (xhr.status === 409)
+                    showAlert("La canción ya está en la playlist.", "warning");
+                else
+                    showAlert("Ocurrió un error al agregar la canción.", "danger");
             }
         });
     });
 
-    // Búsqueda dinámica
+    // Busqueda dinamica de canciones
     function cargarCanciones(query, page) {
         $.ajax({
-            url: '/canciones/buscar',
-            type: 'GET',
-            data: { q: query, page: page },
-            success: function (response) {
-                $('#contenedor-canciones').html($(response).find('#contenedor-canciones').html());
+            url: "/canciones/buscar",
+            type: "GET",
+            data: { q: query, page },
+            success: response => {
+                $("#contenedor-canciones").html($(response).find("#contenedor-canciones").html());
             },
-            error: function () {
-                console.error("Error al cargar canciones");
-            }
+            error: () => console.error("Error al cargar canciones")
         });
     }
 
-    $('#buscador').on('input', function () {
-        const query = $(this).val();
-        cargarCanciones(query, 0);
+    // Cada vez que el usuario escribe, se actualiza la lista
+    $("#buscador").on("input", function () {
+        cargarCanciones($(this).val(), 0);
     });
 
-    $(document).on('click', '.btn-pagina', function (e) {
+    // Paginacion
+    $(document).on("click", ".btn-pagina", function (e) {
         e.preventDefault();
-        const query = $('#buscador').val();
-        const page = $(this).data('page');
+        const query = $("#buscador").val();
+        const page = $(this).data("page");
         cargarCanciones(query, page);
     });
 
-    // Descargar canción
-    $("#downloadSong").click(function (e) {
+    // Descargar cancion directamente
+    $("#downloadSong").click(e => {
         e.preventDefault();
         if (!selectedSongId) return;
-
-        window.location.href = "/canciones/" + selectedSongId + "/descargar";
-
+        window.location.href = `/canciones/${selectedSongId}/descargar`;
         $("#contextMenu").hide();
     });
 });

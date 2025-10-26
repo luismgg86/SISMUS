@@ -60,7 +60,6 @@ public class AdminArtistaController {
     public String editar(@PathVariable Integer id, Model model) {
         ArtistaDto artista = artistaService.buscarPorId(id)
                 .orElseThrow(() -> new ArtistaNoEncontradoException("Artista con ID " + id + " no encontrado"));
-
         model.addAttribute("modo", "editar");
         model.addAttribute("id", id);
         model.addAttribute("artista", artista);
@@ -88,6 +87,4 @@ public class AdminArtistaController {
         artistaService.activar(id);
         return "redirect:/admin/artistas/inactivos";
     }
-
-
 }

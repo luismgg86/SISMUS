@@ -28,8 +28,7 @@ public class UsuarioController {
     public String mostrarPerfil(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails != null) {
             String nickname = userDetails.getUsername();
-            UsuarioResponseDto usuario = usuarioService.buscarPorNickname(nickname)
-                    .orElse(null);
+            UsuarioResponseDto usuario = usuarioService.buscarPorNickname(nickname).orElse(null);
             model.addAttribute("usuario", usuario);
         }
         model.addAttribute("contenido", "usuario/perfil");
@@ -46,24 +45,19 @@ public class UsuarioController {
     @PostMapping("/cambiar-password")
     public String cambiarPassword(@AuthenticationPrincipal UserDetails userDetails,
                                   @ModelAttribute("passwordForm") CambiarPasswordDto form,
-                                  RedirectAttributes redirectAttributes) {
-
+                                  RedirectAttributes redirectAttrs) {
         var usuario = usuarioService.buscarUsuarioPorNickname(userDetails.getUsername())
                 .orElseThrow(() -> new UsuarioNoEncontradoException("No se encontró el usuario"));
-
         if (!passwordEncoder.matches(form.getPasswordActual(), usuario.getPassword())) {
-            redirectAttributes.addFlashAttribute("error", "La contraseña actual es incorrecta.");
+            redirectAttrs.addFlashAttribute("error", "La contraseña actual es incorrecta.");
             return "redirect:/usuario/cambiar-password";
         }
-
         if (!form.getNuevaPassword().equals(form.getConfirmarPassword())) {
-            redirectAttributes.addFlashAttribute("error", "Las contraseñas nuevas no coinciden.");
+            redirectAttrs.addFlashAttribute("error", "Las contraseñas nuevas no coinciden.");
             return "redirect:/usuario/cambiar-password";
         }
-
         usuarioService.actualizarPassword(usuario.getId(), form.getNuevaPassword());
-
-        redirectAttributes.addFlashAttribute("mensajeExito", "Contraseña actualizada correctamente.");
+        redirectAttrs.addFlashAttribute("mensajeExito", "Contraseña actualizada correctamente.");
         return "redirect:/usuario/perfil";
     }
 }

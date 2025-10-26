@@ -1,8 +1,6 @@
 package mx.dgtic.unam.sismus.repository;
 
 import mx.dgtic.unam.sismus.model.Lista;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,90 +10,61 @@ import java.util.List;
 
 public interface ListaRepository extends JpaRepository<Lista, Integer> {
 
-    // Buscar listas por nickname de usuario
     List<Lista> findByUsuario_Nickname(String nickname);
+    List<Lista> findByUsuario_Id(Integer usuarioId);
 
-    // Buscar listas por ID de usuario
-    List<Lista> findByUsuario_Id(Integer id);
-
-    // Búsqueda parcial por nombre
-    List<Lista> findByNombreContainingIgnoreCase(String nombre);
-
-    // Paginación para catálogos
-    Page<Lista> findByUsuario_Nickname(String nickname, Pageable pageable);
-
-    // Traer lista con canciones y usuario en una sola query
     @Query("""
-    SELECT l FROM Lista l
-    LEFT JOIN FETCH l.canciones lc
-    LEFT JOIN FETCH lc.cancion
-    WHERE l.id = :id
+        SELECT l
+        FROM Lista l
+        WHERE LOWER(l.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))
     """)
-    Lista findByIdConRelaciones(@Param("id") Integer id);
-
-
-    // Traer todas las listas con canciones y usuario
-    @EntityGraph(attributePaths = {"usuario", "canciones"})
-    @Query("select l from Lista l")
-    List<Lista> findAllConRelaciones();
-
-    // Buscar listas por correo de usuario
-    @Query("""
-        select l
-        from Lista l
-        join l.usuario u
-        where u.correo = :correo
-    """)
-    List<Lista> buscarPorCorreoUsuario(@Param("correo") String correo);
+    List<Lista> buscarPorNombre(@Param("nombre") String nombre);
 
     @Query("""
-    SELECT DISTINCT l
-    FROM Lista l
-    JOIN l.canciones lc
-    JOIN lc.cancion c
-    WHERE LOWER(c.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))
-    """)
-    List<Lista> buscarPorTituloDeCancion(@Param("titulo") String titulo);
-
-
-    //Consultas para reportes
-
-    // Listas sin canciones registradas
-    @Query("""
-        select l
-        from Lista l
-        where l.canciones IS EMPTY
-    """)
-    List<Lista> listasVacias();
-
-    // Reporte: cantidad de canciones por lista
-    @Query("""
-        select l.nombre AS nombre, count(c) AS totalCanciones
-        from Lista l
-        left join l.canciones c
-        group by l.nombre
-        order by totalCanciones DESC
-    """)
-    List<Object[]> reporteConteoCancionesPorLista();
-
-    // Reporte: top listas con más canciones
-    @Query("""
-        select l.nombre AS nombre, count(c) AS totalCanciones
-        from Lista l
-        left join l.canciones c
-        group by l.id, l.nombre
-        order by totalCanciones DESC
-    """)
-    List<Object[]> topListasMasPopulares();
-
-    // Buscar listas por usuario y nombre parcial
-    @Query("""
-        select l
-        from Lista l
-        join l.usuario u
-        where lower(u.nickname) = lower(:nickname)
-        AND lower(l.nombre) like lower(concat('%', :nombre, '%'))
+        SELECT l
+        FROM Lista l
+        JOIN l.usuario u
+        WHERE LOWER(u.nickname) = LOWER(:nickname)
+          AND LOWER(l.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))
     """)
     List<Lista> buscarPorUsuarioYNombre(@Param("nickname") String nickname,
                                         @Param("nombre") String nombre);
+
+    @Query("""
+        SELECT l
+        FROM Lista l
+        LEFT JOIN FETCH l.canciones lc
+        LEFT JOIN FETCH lc.cancion
+        WHERE l.id = :id
+    """)
+    Lista findByIdConRelaciones(@Param("id") Integer id);
+
+    @EntityGraph(attributePaths = {"usuario", "canciones"})
+    @Query("SELECT l FROM Lista l")
+    List<Lista> findAllConRelaciones();
+
+    @Query("""
+        SELECT l
+        FROM Lista l
+        WHERE l.canciones IS EMPTY
+    """)
+    List<Lista> listasVacias();
+
+    @Query("""
+        SELECT l.nombre AS nombre, COUNT(c) AS totalCanciones
+        FROM Lista l
+        LEFT JOIN l.canciones c
+        GROUP BY l.nombre
+        ORDER BY totalCanciones DESC
+    """)
+    List<Object[]> reporteConteoCancionesPorLista();
+
+    @Query("""
+        SELECT l.nombre AS nombre, COUNT(c) AS totalCanciones
+        FROM Lista l
+        LEFT JOIN l.canciones c
+        GROUP BY l.id, l.nombre
+        ORDER BY totalCanciones DESC
+    """)
+    List<Object[]> topListasMasPopulares();
 }

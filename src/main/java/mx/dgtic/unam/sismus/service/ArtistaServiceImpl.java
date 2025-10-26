@@ -29,26 +29,17 @@ public class ArtistaServiceImpl implements ArtistaService {
 
     @Transactional(readOnly = true)
     public List<ArtistaDto> listarTodos() {
-        return artistaRepository.findAll()
-                .stream()
-                .map(artistaMapper::toDto)
-                .toList();
+        return artistaRepository.findAll().stream().map(artistaMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
     public List<ArtistaDto> listarActivos() {
-        return artistaRepository.findByActivoTrue()
-                .stream()
-                .map(artistaMapper::toDto)
-                .toList();
+        return artistaRepository.findByActivoTrue().stream().map(artistaMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
     public List<ArtistaDto> listarInactivos() {
-        return artistaRepository.findByActivoFalse()
-                .stream()
-                .map(artistaMapper::toDto)
-                .toList();
+        return artistaRepository.findByActivoFalse().stream().map(artistaMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
@@ -57,10 +48,8 @@ public class ArtistaServiceImpl implements ArtistaService {
     }
 
     public ArtistaDto guardar(ArtistaDto artistaDto) {
-        if (artistaRepository.findByClave(artistaDto.getClave()).isPresent()) {
+        if (artistaRepository.findByClave(artistaDto.getClave()).isPresent())
             throw new EntidadDuplicadaException("Ya existe un artista con la clave: " + artistaDto.getClave());
-        }
-
         Artista artista = artistaMapper.toEntity(artistaDto);
         artista.setActivo(true);
         return artistaMapper.toDto(artistaRepository.save(artista));
@@ -69,12 +58,9 @@ public class ArtistaServiceImpl implements ArtistaService {
     public void actualizar(Integer id, ArtistaDto dto) {
         Artista existente = artistaRepository.findById(id)
                 .orElseThrow(() -> new ArtistaNoEncontradoException("Artista no encontrado con ID " + id));
-
         Optional<Artista> otro = artistaRepository.findByClave(dto.getClave());
-        if (otro.isPresent() && !otro.get().getArtistaId().equals(id)) {
+        if (otro.isPresent() && !otro.get().getArtistaId().equals(id))
             throw new EntidadDuplicadaException("Ya existe otro artista con la clave: " + dto.getClave());
-        }
-
         existente.setNombre(dto.getNombre());
         existente.setClave(dto.getClave());
         artistaRepository.save(existente);
@@ -84,6 +70,13 @@ public class ArtistaServiceImpl implements ArtistaService {
         Artista artista = artistaRepository.findById(id)
                 .orElseThrow(() -> new ArtistaNoEncontradoException("Artista no encontrado con ID " + id));
         artista.setActivo(false);
+        artistaRepository.save(artista);
+    }
+
+    public void activar(Integer id) {
+        Artista artista = artistaRepository.findById(id)
+                .orElseThrow(() -> new ArtistaNoEncontradoException("Artista con ID " + id + " no encontrado"));
+        artista.setActivo(true);
         artistaRepository.save(artista);
     }
 
@@ -101,47 +94,26 @@ public class ArtistaServiceImpl implements ArtistaService {
 
     @Transactional(readOnly = true)
     public List<ArtistaDto> buscarPorNombre(String nombre) {
-        return artistaRepository.findByNombreContainingIgnoreCase(nombre)
-                .stream()
-                .map(artistaMapper::toDto)
-                .toList();
+        return artistaRepository.findByNombreContainingIgnoreCase(nombre).stream().map(artistaMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
     public Page<ArtistaDto> buscarPorNombrePaginado(String nombre, Pageable pageable) {
-        return artistaRepository.findByNombreContainingIgnoreCase(nombre, pageable)
-                .map(artistaMapper::toDto);
+        return artistaRepository.findByNombreContainingIgnoreCase(nombre, pageable).map(artistaMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     public Optional<ArtistaDetalleDto> detalleConCancionesPorClave(String clave) {
-        return artistaRepository.detalleConCancionesPorClave(clave)
-                .map(artistaMapper::toDetalleDto);
+        return artistaRepository.detalleConCancionesPorClave(clave).map(artistaMapper::toDetalleDto);
     }
 
     @Transactional(readOnly = true)
     public List<ArtistaDetalleDto> listarConCanciones() {
-        return artistaRepository.findAllConCanciones()
-                .stream()
-                .map(artistaMapper::toDetalleDto)
-                .toList();
+        return artistaRepository.findAllConCanciones().stream().map(artistaMapper::toDetalleDto).toList();
     }
 
     @Transactional(readOnly = true)
     public List<ArtistaDto> artistasSinCanciones() {
-        return artistaRepository.artistasSinCanciones()
-                .stream()
-                .map(artistaMapper::toDto)
-                .toList();
+        return artistaRepository.artistasSinCanciones().stream().map(artistaMapper::toDto).toList();
     }
-
-    @Override
-    public void activar(Integer id) {
-        Artista artista = artistaRepository.findById(id)
-                .orElseThrow(() -> new ArtistaNoEncontradoException("Artista con ID " + id + " no encontrado"));
-
-        artista.setActivo(true);
-        artistaRepository.save(artista);
-    }
-
 }

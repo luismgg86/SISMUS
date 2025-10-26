@@ -2,6 +2,8 @@ package mx.dgtic.unam.sismus.service;
 
 import mx.dgtic.unam.sismus.dto.UsuarioRegistroDto;
 import mx.dgtic.unam.sismus.dto.UsuarioResponseDto;
+import mx.dgtic.unam.sismus.exception.EntidadDuplicadaException;
+import mx.dgtic.unam.sismus.exception.RolNoEncontradoException;
 import mx.dgtic.unam.sismus.exception.UsuarioNoEncontradoException;
 import mx.dgtic.unam.sismus.mapper.UsuarioMapper;
 import mx.dgtic.unam.sismus.model.Rol;
@@ -38,47 +40,29 @@ public class UsuarioServiceImpl implements UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
     public UsuarioResponseDto registrar(UsuarioRegistroDto dto) {
-
-        if (usuarioRepository.findByCorreo(dto.getCorreo()).isPresent()) {
-            throw new RuntimeException("Ya existe una cuenta con ese correo electrónico.");
-        }
-
-        if (usuarioRepository.findByNickname(dto.getNickname()).isPresent()) {
-            throw new RuntimeException("El nombre de usuario (nickname) ya está en uso.");
-        }
-
+        if (usuarioRepository.findByCorreo(dto.getCorreo()).isPresent())
+            throw new EntidadDuplicadaException("Ya existe una cuenta con ese correo electrónico.");
+        if (usuarioRepository.findByNickname(dto.getNickname()).isPresent())
+            throw new EntidadDuplicadaException("El nombre de usuario (nickname) ya está en uso.");
         Rol rolUser = rolRepository.findByNombre("USER")
-                .orElseThrow(() -> new RuntimeException("No existe el rol USER"));
-
+                .orElseThrow(() -> new RolNoEncontradoException("No existe el rol USER"));
         Usuario usuario = usuarioMapper.toEntity(dto, rolUser);
-
-        if (dto.getApMaterno() == null) {
-            dto.setApMaterno("");
-        }
-
+        if (dto.getApMaterno() == null) dto.setApMaterno("");
         usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
-
         return usuarioMapper.toResponseDto(usuarioRepository.save(usuario));
     }
 
-
-    @Override
     public UsuarioResponseDto actualizar(Integer id, UsuarioRegistroDto dto) {
         Usuario existente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
-
         existente.setNombre(dto.getNombre());
         existente.setApPaterno(dto.getApPaterno());
         existente.setApMaterno(dto.getApMaterno());
         existente.setCorreo(dto.getCorreo());
         existente.setNickname(dto.getNickname());
-
-        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            existente.setPassword(passwordEncoder.encode(dto.getPassword())); // ✅ Encripta
-        }
-
+        if (dto.getPassword() != null && !dto.getPassword().isBlank())
+            existente.setPassword(passwordEncoder.encode(dto.getPassword()));
         return usuarioMapper.toResponseDto(usuarioRepository.save(existente));
     }
 
@@ -95,56 +79,43 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Transactional(readOnly = true)
     public List<UsuarioResponseDto> listarTodos() {
-        return usuarioRepository.findAll().stream()
-                .map(usuarioMapper::toResponseDto)
-                .toList();
+        return usuarioRepository.findAll().stream().map(usuarioMapper::toResponseDto).toList();
     }
 
     @Transactional(readOnly = true)
     public Page<UsuarioResponseDto> listarPaginado(String filtro, Pageable pageable) {
-        return usuarioRepository.findByNombreContainingIgnoreCase(filtro, pageable)
-                .map(usuarioMapper::toResponseDto);
+        return usuarioRepository.findByNombreContainingIgnoreCase(filtro, pageable).map(usuarioMapper::toResponseDto);
     }
 
-    @Override
     public void actualizarPassword(Integer idUsuario, String nuevaPassword) {
-        var usuario = usuarioRepository.findById(idUsuario)
+        Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario con Id: " + idUsuario + " no encontrado"));
-
         usuario.setPassword(passwordEncoder.encode(nuevaPassword));
         usuarioRepository.save(usuario);
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public Optional<Usuario> buscarUsuarioPorNickname(String nickname) {
         return usuarioRepository.findByNickname(nickname);
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public Optional<Usuario> buscarUsuarioPorCorreo(String correo) {
         return usuarioRepository.findByCorreo(correo);
     }
 
     public void cambiarEstado(Integer id, boolean activo) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID " + id));
+                .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado con ID " + id));
         usuario.setActivo(activo);
         usuarioRepository.save(usuario);
     }
 
-    /**
-     * ✅ Nuevo método: buscar usuario con sus roles completos (para vista de edición)
-     */
     @Transactional(readOnly = true)
     public UsuarioResponseDto buscarPorId(Integer id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado con ID " + id));
-
-        Set<String> roles = usuario.getRoles()
-                .stream()
-                .map(Rol::getNombre)
-                .collect(Collectors.toSet());
-
+        Set<String> roles = usuario.getRoles().stream().map(Rol::getNombre).collect(Collectors.toSet());
         UsuarioResponseDto dto = new UsuarioResponseDto();
         dto.setId(usuario.getId());
         dto.setNombreCompleto(usuario.getNombre() + " " + usuario.getApPaterno() + " " + usuario.getApMaterno());
@@ -152,25 +123,17 @@ public class UsuarioServiceImpl implements UsuarioService {
         dto.setNickname(usuario.getNickname());
         dto.setActivo(usuario.isActivo());
         dto.setRoles(roles);
-
         return dto;
     }
 
-    /**
-     * ✅ Ajustado para evitar errores cuando no se seleccionan roles
-     */
     public void actualizarRoles(Integer id, Set<String> rolesSeleccionados) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID " + id));
-
-        // Limpia los roles actuales
+                .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado con ID " + id));
         usuario.getRoles().clear();
-
         if (rolesSeleccionados != null && !rolesSeleccionados.isEmpty()) {
             Set<Rol> nuevosRoles = rolRepository.findByNombreIn(rolesSeleccionados);
             usuario.getRoles().addAll(nuevosRoles);
         }
-
         usuarioRepository.save(usuario);
     }
 }
