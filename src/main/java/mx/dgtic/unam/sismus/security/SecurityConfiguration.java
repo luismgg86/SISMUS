@@ -12,6 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 
 import java.time.LocalDateTime;
 
@@ -111,11 +115,11 @@ public class SecurityConfiguration {
         return (request, response, exception) -> {
             String errorMessage;
 
-            if (exception instanceof org.springframework.security.core.userdetails.UsernameNotFoundException) {
+            if (exception instanceof UsernameNotFoundException) {
                 errorMessage = "Usuario no encontrado.";
-            } else if (exception instanceof org.springframework.security.authentication.BadCredentialsException) {
+            } else if (exception instanceof BadCredentialsException) {
                 errorMessage = "Contraseña incorrecta.";
-            } else if (exception instanceof org.springframework.security.authentication.DisabledException) {
+            } else if (exception instanceof DisabledException) {
                 errorMessage = "Usuario inactivo. Contacte al administrador.";
             } else {
                 errorMessage = "Error al iniciar sesión.";
@@ -125,4 +129,5 @@ public class SecurityConfiguration {
             response.sendRedirect("/login?error=true");
         };
     }
+
 }

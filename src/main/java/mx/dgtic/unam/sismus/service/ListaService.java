@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ListaService {
-    ListaResponseDto crearPlaylist(ListaRequestDto dto);
     ListaResponseDto obtenerConRelaciones(Integer id);
     List<ListaResponseDto> obtenerListasPorUsuario(String nickname);
     void crearPlaylistVacia(String nombre, Integer usuarioId);

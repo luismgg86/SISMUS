@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mx.dgtic.unam.sismus.dto.CancionResponseDto;
 import mx.dgtic.unam.sismus.dto.ListaResponseDto;
+import mx.dgtic.unam.sismus.dto.UsuarioResponseDto;
 import mx.dgtic.unam.sismus.service.CancionService;
 import mx.dgtic.unam.sismus.service.ListaService;
 import mx.dgtic.unam.sismus.service.UsuarioService;
@@ -42,12 +43,16 @@ public class ListaController {
         if (userDetails != null) {
             String nickname = userDetails.getUsername();
             List<ListaResponseDto> playlists = listaService.obtenerListasPorUsuario(nickname);
+            UsuarioResponseDto usuario = usuarioService.buscarPorNickname(nickname).orElse(null);
+
+            model.addAttribute("usuario", usuario);
             model.addAttribute("playlists", playlists);
         }
         model.addAttribute("titulo", "Tus Playlists");
         model.addAttribute("contenido", "playlist/listar");
         return "layout/main";
     }
+
 
     @GetMapping("/{id}")
     public String verPlaylist(@PathVariable Integer id, Model model) {

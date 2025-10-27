@@ -48,13 +48,6 @@ public class ListaServiceImpl implements ListaService {
         this.listaMapper = listaMapper;
     }
 
-    public ListaResponseDto crearPlaylist(ListaRequestDto dto) {
-        Usuario usuario = usuarioRepository.getReferenceById(dto.getUsuarioId());
-        Lista lista = listaMapper.toEntity(dto, usuario);
-        lista.setFechaCreacion(LocalDate.now());
-        return listaMapper.toResponseDto(listaRepository.save(lista));
-    }
-
     @Transactional(readOnly = true)
     public ListaResponseDto obtenerConRelaciones(Integer id) {
         Lista lista = listaRepository.findByIdConRelaciones(id);
