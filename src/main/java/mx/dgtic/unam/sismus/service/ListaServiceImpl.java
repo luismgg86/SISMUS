@@ -94,6 +94,7 @@ public class ListaServiceImpl implements ListaService {
         listaRepository.deleteById(id);
     }
 
+    @Override
     public void descargarPlaylistComoZip(Integer playlistId, String nickname, HttpServletResponse response) {
         Lista lista = listaRepository.findById(playlistId)
                 .orElseThrow(() -> new ListaNoEncontradaException("Playlist no encontrada con ID: " + playlistId));
@@ -111,8 +112,14 @@ public class ListaServiceImpl implements ListaService {
             response.setHeader("Content-Disposition", "attachment; filename=\"" + nombreZip + "\"");
 
             try (ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream())) {
+
+                int cancionesAgregadas = 0;
+
                 for (ListaCancion lc : lista.getCanciones()) {
                     Cancion cancion = lc.getCancion();
+
+                    if (cancion == null || !cancion.isActivo()) continue;
+                    if (cancion.getArtista() == null || !cancion.getArtista().isActivo()) continue;
 
                     Path rutaArchivo = Paths.get("src/main/resources/static/" + cancion.getAudio());
                     if (Files.exists(rutaArchivo)) {
@@ -124,15 +131,24 @@ public class ListaServiceImpl implements ListaService {
                         zipOut.putNextEntry(zipEntry);
                         Files.copy(rutaArchivo, zipOut);
                         zipOut.closeEntry();
+
+                        cancionesAgregadas++;
                     }
                 }
+
                 zipOut.finish();
+
+                if (cancionesAgregadas == 0) {
+                    throw new RuntimeException("No se encontraron canciones activas en la playlist.");
+                }
+
             }
 
         } catch (IOException e) {
             throw new RuntimeException("Error al generar el archivo ZIP: " + e.getMessage(), e);
         }
     }
+
 
     public void crearPlaylistVacia(String nombre, Integer usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
