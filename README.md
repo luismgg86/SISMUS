@@ -102,6 +102,19 @@ sismus/
 
 ### 2️⃣ Configurar base de datos
 
+🧩 Inicializar la base de datos
+
+El proyecto incluye un script SQL completo llamado:
+
+`src/main/resources/db/scripts/sismus.sql`
+
+Abre una terminal o consola de comandos y ejecuta:
+
+`mysql -u root -p < src/main/resources/db/scripts/sismus.sql`
+
+Este comando ejecuta el script completo, creando la base de datos y poblando todos los datos de ejemplo.
+Asegúrate de que el usuario y contraseña de MariaDB coincidan con los configurados en application.properties
+
 Edita el archivo `src/main/resources/application.properties`:
 
 ```properties
@@ -125,6 +138,20 @@ spring.thymeleaf.cache=false
 💡 Cambia el usuario y contraseña según tu configuración local.
 
 ```
+
+📋 Datos iniciales
+
+El script ya incluye varios usuarios de prueba con roles y datos precargados:
+
+| 👤 **Usuario** | 📧 **Correo**        | 🧩 **Rol**   | 🔑 **Contraseña (bcrypt)** |
+| -------------- | -------------------- | ------------ | -------------------------- |
+| `luismgg`      | `luis@example.com`   | ADMIN / USER | (encriptada)               |
+| `anamlo`       | `ana@example.com`    | ADMIN / USER | (encriptada)               |
+| `carlitos`     | `carlos@example.com` | USER         | (encriptada)               |
+| `pedropz`      | `pedropz@gmail.com`  | USER         | (encriptada)               |
+| `pepito123`    | `pepito@gmail.com`   | USER         | (encriptada)               |
+| `pepe1`        | `pepe@example.com`   | ADMIN / USER | (encriptada)               |
+🔐 Puedes iniciar sesión con luismgg o anamlo para acceder al panel de administración.
 
 ---
 
