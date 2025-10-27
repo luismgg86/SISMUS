@@ -27,6 +27,7 @@
     <div class="container">
         <div class="row g-4 justify-content-center">
 
+            <!-- Reporte: Canciones -->
             <div class="col-12 col-md-4">
                 <div class="card reporte-card h-100">
                     <div class="card-body text-center d-flex flex-column justify-content-between">
@@ -48,6 +49,7 @@
                 </div>
             </div>
 
+            <!-- 📚 Reporte: Listas -->
             <div class="col-12 col-md-4">
                 <div class="card reporte-card h-100">
                     <div class="card-body text-center d-flex flex-column justify-content-between">
@@ -69,6 +71,7 @@
                 </div>
             </div>
 
+            <!--  Reporte: Actividad de Usuarios -->
             <div class="col-12 col-md-4">
                 <div class="card reporte-card h-100">
                     <div class="card-body text-center d-flex flex-column justify-content-between">
@@ -83,6 +86,50 @@
                                 <i class="bi bi-file-earmark-pdf"></i> PDF
                             </a>
                             <a th:href="@{/admin/reportes/excel/actividad}" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reporte: Top Artistas con más descargas -->
+            <div class="col-12 col-md-4">
+                <div class="card reporte-card h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-3">🧑‍🎤 Artistas con Más Descargas</h5>
+                            <p class="text-light opacity-75 small mb-4">
+                                Los artistas más escuchados según el número total de descargas registradas.
+                            </p>
+                        </div>
+                        <div>
+                            <a th:href="@{/admin/reportes/pdf/artistas}" class="btn btn-instagram btn-sm me-2">
+                                <i class="bi bi-file-earmark-pdf"></i> PDF
+                            </a>
+                            <a th:href="@{/admin/reportes/excel/artistas}" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reporte: Top Géneros con más descargas -->
+            <div class="col-12 col-md-4">
+                <div class="card reporte-card h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-3">🎧 Géneros con Más Descargas</h5>
+                            <p class="text-light opacity-75 small mb-4">
+                                Ranking de géneros musicales más populares entre los usuarios del sistema.
+                            </p>
+                        </div>
+                        <div>
+                            <a th:href="@{/admin/reportes/pdf/generos}" class="btn btn-instagram btn-sm me-2">
+                                <i class="bi bi-file-earmark-pdf"></i> PDF
+                            </a>
+                            <a th:href="@{/admin/reportes/excel/generos}" class="btn btn-outline-light btn-sm">
                                 <i class="bi bi-file-earmark-excel"></i> Excel
                             </a>
                         </div>

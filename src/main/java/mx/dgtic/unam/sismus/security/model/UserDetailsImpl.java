@@ -10,8 +10,8 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
- * Implementación personalizada de {@link UserDetails}
- * que adapta la entidad {@link Usuario} a los requerimientos de Spring Security.
+ * Implementación personalizada de UserDetails
+ * que adapta la entidad Usuario a los requerimientos de Spring Security.
  */
 public class UserDetailsImpl implements UserDetails {
 

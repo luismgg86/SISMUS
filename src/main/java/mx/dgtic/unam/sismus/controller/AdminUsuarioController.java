@@ -23,6 +23,7 @@ public class AdminUsuarioController {
     @GetMapping
     public String listarUsuarios(Model model) {
         List<UsuarioResponseDto> usuarios = usuarioService.listarTodos();
+        model.addAttribute("titulo", "Administrar de usuarios");
         model.addAttribute("usuarios", usuarios);
         model.addAttribute("contenido", "admin/usuarios");
         return "layout/main";
@@ -47,6 +48,7 @@ public class AdminUsuarioController {
                 .filter(u -> u.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
+        model.addAttribute("titulo", "Roles de usuario");
         model.addAttribute("usuario", usuario);
         model.addAttribute("contenido", "admin/usuario-roles");
         return "layout/main";

@@ -10,7 +10,9 @@ import mx.dgtic.unam.sismus.service.UsuarioService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,18 @@ public class ListaController {
         this.usuarioService = usuarioService;
     }
 
+    @GetMapping
+    public String mostrarPlaylists(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        if (userDetails != null) {
+            String nickname = userDetails.getUsername();
+            List<ListaResponseDto> playlists = listaService.obtenerListasPorUsuario(nickname);
+            model.addAttribute("playlists", playlists);
+        }
+        model.addAttribute("titulo", "Tus Playlists");
+        model.addAttribute("contenido", "playlist/listar");
+        return "layout/main";
+    }
+
     @GetMapping("/{id}")
     public String verPlaylist(@PathVariable Integer id, Model model) {
         ListaResponseDto playlist = listaService.obtenerConRelaciones(id);
@@ -48,6 +62,7 @@ public class ListaController {
         List<CancionResponseDto> cancionesDisponibles =
                 cancionService.buscarPorTituloActivoPaginado(null, pageable).getContent();
         model.addAttribute("playlist", playlist);
+        model.addAttribute("titulo", "Detalle playlist");
         model.addAttribute("cancionesDisponibles", cancionesDisponibles);
         model.addAttribute("contenido", "playlist/detalle");
         return "layout/main";

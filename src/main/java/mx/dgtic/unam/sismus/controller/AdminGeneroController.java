@@ -22,6 +22,7 @@ public class AdminGeneroController {
     @GetMapping
     public String listar(Model model) {
         List<GeneroDto> generos = generoService.listarTodos();
+        model.addAttribute("titulo", "Administrar géneros");
         model.addAttribute("generos", generos);
         model.addAttribute("contenido", "admin/generos");
         return "layout/main";
@@ -29,6 +30,7 @@ public class AdminGeneroController {
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
+        model.addAttribute("titulo", "Nuevo género");
         model.addAttribute("modo", "nuevo");
         model.addAttribute("genero", new GeneroDto());
         model.addAttribute("contenido", "admin/genero-form");
@@ -59,6 +61,7 @@ public class AdminGeneroController {
     public String editar(@PathVariable Integer id, Model model) {
         GeneroDto genero = generoService.buscarPorId(id)
                 .orElseThrow(() -> new RuntimeException("Género con id " + id + " no encontrado"));
+        model.addAttribute("titulo", "Editar género");
         model.addAttribute("modo", "editar");
         model.addAttribute("id", id);
         model.addAttribute("genero", genero);

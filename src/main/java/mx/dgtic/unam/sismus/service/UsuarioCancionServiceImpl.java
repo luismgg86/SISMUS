@@ -1,17 +1,17 @@
 package mx.dgtic.unam.sismus.service;
 
+import mx.dgtic.unam.sismus.dto.ArtistaDto;
 import mx.dgtic.unam.sismus.dto.CancionResponseDto;
+import mx.dgtic.unam.sismus.dto.GeneroDto;
 import mx.dgtic.unam.sismus.dto.UsuarioCancionDto;
 import mx.dgtic.unam.sismus.exception.CancionNoEncontradaException;
-import mx.dgtic.unam.sismus.exception.DescargaNoEncontradaException;
 import mx.dgtic.unam.sismus.exception.UsuarioNoEncontradoException;
 import mx.dgtic.unam.sismus.mapper.UsuarioCancionMapper;
-import mx.dgtic.unam.sismus.model.Cancion;
-import mx.dgtic.unam.sismus.model.Usuario;
-import mx.dgtic.unam.sismus.model.UsuarioCancion;
+import mx.dgtic.unam.sismus.model.*;
 import mx.dgtic.unam.sismus.repository.CancionRepository;
 import mx.dgtic.unam.sismus.repository.UsuarioCancionRepository;
 import mx.dgtic.unam.sismus.repository.UsuarioRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,31 +50,67 @@ public class UsuarioCancionServiceImpl implements UsuarioCancionService {
     }
 
     @Transactional(readOnly = true)
-    public List<UsuarioCancionDto> obtenerDescargasPorUsuario(Integer usuarioId) {
-        return usuarioCancionRepository.findByUsuarioId(usuarioId).stream()
-                .map(usuarioCancionMapper::toDto)
+    @Override
+    public List<CancionResponseDto> obtenerTop10CancionesMasDescargadas() {
+
+        String nickname = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return usuarioCancionRepository.top10CancionesMasDescargadas(nickname)
+                .stream()
+                .limit(10)
+                .map(cancion -> new CancionResponseDto(
+                        cancion.getId(),
+                        cancion.getTitulo(),
+                        cancion.getAudio(),
+                        cancion.getDuracion(),
+                        cancion.isActivo(),
+                        cancion.getFechaAlta(),
+                        cancion.getArtista() != null ? cancion.getArtista().getArtistaId() : null,
+                        cancion.getArtista() != null ? cancion.getArtista().getNombre() : null,
+                        cancion.getGenero() != null ? cancion.getGenero().getId() : null,
+                        cancion.getGenero() != null ? cancion.getGenero().getNombre() : null,
+                        null
+                ))
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public List<UsuarioCancionDto> obtenerDescargasPorCancion(Integer cancionId) {
-        return usuarioCancionRepository.findByCancionId(cancionId).stream()
-                .map(usuarioCancionMapper::toDto)
+    @Override
+    @Transactional
+    public List<ArtistaDto> obtenerTopArtistasMasDescargados() {
+        var resultados = usuarioCancionRepository.topArtistasMasDescargados();
+
+        return resultados.stream()
+                .map(fila -> {
+                    Artista artista = (Artista) fila[0];
+                    Long totalDescargas = (Long) fila[1];
+                    ArtistaDto dto = new ArtistaDto();
+                    dto.setId(artista.getArtistaId());
+                    dto.setClave(artista.getClave());
+                    dto.setNombre(artista.getNombre() + " (" + totalDescargas + " descargas)");
+                    return dto;
+                })
+                .limit(10)
                 .toList();
     }
 
-    public void eliminarDescarga(Integer id) {
-        if (!usuarioCancionRepository.existsById(id))
-            throw new DescargaNoEncontradaException("Descarga no encontrada con ID: " + id);
-        usuarioCancionRepository.deleteById(id);
+    @Override
+    @Transactional
+    public List<GeneroDto> obtenerTopGenerosMasDescargados() {
+        var resultados = usuarioCancionRepository.topGenerosMasDescargados();
+
+        return resultados.stream()
+                .map(fila -> {
+                    Genero genero = (Genero) fila[0];
+                    Long totalDescargas = (Long) fila[1];
+                    GeneroDto dto = new GeneroDto();
+                    dto.setId(genero.getId());
+                    dto.setNombre(genero.getNombre() + " (" + totalDescargas + " descargas)");
+                    dto.setClave(genero.getClave());
+                    return dto;
+                })
+                .limit(10)
+                .toList();
     }
 
-    @Transactional(readOnly = true)
-    public boolean existeDescarga(Integer usuarioId, Integer cancionId) {
-        return usuarioCancionRepository.existsByUsuarioIdAndCancionId(usuarioId, cancionId);
-    }
 
-    public void registrarDescargas(Integer usuarioId, List<CancionResponseDto> canciones) {
-        for (CancionResponseDto c : canciones) registrarDescarga(usuarioId, c.getId());
-    }
 }

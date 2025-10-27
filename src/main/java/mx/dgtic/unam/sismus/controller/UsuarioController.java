@@ -31,6 +31,7 @@ public class UsuarioController {
             UsuarioResponseDto usuario = usuarioService.buscarPorNickname(nickname).orElse(null);
             model.addAttribute("usuario", usuario);
         }
+        model.addAttribute("titulo", "Tu perfil");
         model.addAttribute("contenido", "usuario/perfil");
         return "layout/main";
     }

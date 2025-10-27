@@ -38,6 +38,7 @@ public class PrincipalController {
             String nickname = userDetails.getUsername();
             playlists = listaService.obtenerListasPorUsuario(nickname);
         }
+        model.addAttribute("titulo", "Inicio");
         model.addAttribute("cancionesPage", cancionesPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", cancionesPage.getTotalPages());
@@ -46,17 +47,6 @@ public class PrincipalController {
         model.addAttribute("exito", exito);
         model.addAttribute("error", error);
         model.addAttribute("contenido", "cancion/listar");
-        return "layout/main";
-    }
-
-    @GetMapping("/playlists")
-    public String mostrarPlaylists(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails != null) {
-            String nickname = userDetails.getUsername();
-            List<ListaResponseDto> playlists = listaService.obtenerListasPorUsuario(nickname);
-            model.addAttribute("playlists", playlists);
-        }
-        model.addAttribute("contenido", "playlist/listar");
         return "layout/main";
     }
 }

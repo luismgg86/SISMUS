@@ -13,7 +13,7 @@ public class CancionResponseDto {
     private String titulo;
     private String audio;
     private Integer duracion;
-    private Boolean activo;
+    private boolean activo;
     private LocalDate fechaAlta;
     private Integer artistaId;
     private String artistaNombre;

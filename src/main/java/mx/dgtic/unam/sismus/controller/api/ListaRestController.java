@@ -42,7 +42,4 @@ public class ListaRestController {
         listaService.crearPlaylistVacia(nombre, usuarioId);
         return ResponseEntity.ok(Map.of("mensaje", "Playlist creada correctamente."));
     }
-
-
-
 }

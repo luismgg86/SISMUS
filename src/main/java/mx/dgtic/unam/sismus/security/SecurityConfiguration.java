@@ -1,6 +1,5 @@
 package mx.dgtic.unam.sismus.security;
 
-import jakarta.servlet.http.HttpServletResponse;
 import mx.dgtic.unam.sismus.repository.UsuarioRepository;
 import mx.dgtic.unam.sismus.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;

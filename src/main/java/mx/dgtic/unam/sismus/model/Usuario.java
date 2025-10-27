@@ -35,7 +35,7 @@ public class Usuario {
     @Column(unique = true, length = 30)
     private String nickname;
 
-    @Column(length = 60)
+    @Column(length = 100)
     private String password;
 
     @Column(nullable = false)

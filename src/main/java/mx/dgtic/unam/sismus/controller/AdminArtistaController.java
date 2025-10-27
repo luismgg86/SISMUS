@@ -23,6 +23,7 @@ public class AdminArtistaController {
     @GetMapping
     public String listarArtistas(Model model) {
         List<ArtistaDto> artistas = artistaService.listarActivos();
+        model.addAttribute("titulo", "Administrar artistas");
         model.addAttribute("artistas", artistas);
         model.addAttribute("contenido", "admin/artistas");
         return "layout/main";
@@ -30,6 +31,7 @@ public class AdminArtistaController {
 
     @GetMapping("/nuevo")
     public String nuevoArtista(Model model) {
+        model.addAttribute("titulo", "Nuevo artista");
         model.addAttribute("modo", "nuevo");
         model.addAttribute("artista", new ArtistaDto());
         model.addAttribute("contenido", "admin/artista-form");
@@ -60,6 +62,7 @@ public class AdminArtistaController {
     public String editar(@PathVariable Integer id, Model model) {
         ArtistaDto artista = artistaService.buscarPorId(id)
                 .orElseThrow(() -> new ArtistaNoEncontradoException("Artista con ID " + id + " no encontrado"));
+        model.addAttribute("titulo", "Editar artista");
         model.addAttribute("modo", "editar");
         model.addAttribute("id", id);
         model.addAttribute("artista", artista);
@@ -76,6 +79,7 @@ public class AdminArtistaController {
     @GetMapping("/inactivos")
     public String listarInactivos(Model model) {
         List<ArtistaDto> artistas = artistaService.listarInactivos();
+        model.addAttribute("titulo", "Artistas inactivos");
         model.addAttribute("artistas", artistas);
         model.addAttribute("tituloSeccion", "Artistas Inactivos");
         model.addAttribute("contenido", "admin/artistas");

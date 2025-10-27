@@ -8,14 +8,14 @@ $(function () {
     let selectedId = null;
     let selectedName = null;
 
-    // ===== CSRF automático =====
+    // CSRF
     const token = $("meta[name='_csrf']").attr("content");
     const header = $("meta[name='_csrf_header']").attr("content");
     $(document).ajaxSend(function (e, xhr) {
         xhr.setRequestHeader(header, token);
     });
 
-    // ===== Click derecho sobre una playlist =====
+    // Click derecho sobre una playlist
     $(document).on("contextmenu", ".playlist-card", function (e) {
         e.preventDefault();
         selectedId = $(this).data("playlist-id");
@@ -23,12 +23,12 @@ $(function () {
         $menu.css({ left: e.clientX + "px", top: e.clientY + "px" }).fadeIn(150);
     });
 
-    // ===== Ocultar menú contextual =====
+    // Ocultar menú contextual
     $(document).on("click scroll resize", function () {
         $menu.fadeOut(100);
     });
 
-    // ===== Abrir modal de confirmación de eliminación =====
+    // Abrir modal de confirmación de eliminación
     $("#deletePlaylistAction").on("click", function (e) {
         e.preventDefault();
         $menu.hide();
@@ -36,7 +36,7 @@ $(function () {
         deleteModal.show();
     });
 
-    // ===== Confirmar eliminación =====
+    //Confirmar eliminación
     $("#confirmDeleteBtn").on("click", function () {
         $.ajax({
             url: "/api/playlists/" + selectedId + "/eliminar",

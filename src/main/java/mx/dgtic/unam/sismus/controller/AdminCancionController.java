@@ -35,6 +35,7 @@ public class AdminCancionController {
     @GetMapping
     public String listarCanciones(Model model) {
         List<CancionResponseDto> canciones = cancionService.listarTodas();
+        model.addAttribute("titulo", "Administrar canciones");
         model.addAttribute("canciones", canciones);
         model.addAttribute("contenido", "admin/canciones");
         return "layout/main";
@@ -43,6 +44,7 @@ public class AdminCancionController {
     @GetMapping("/inactivas")
     public String listarInactivas(Model model) {
         List<CancionResponseDto> canciones = cancionService.listarInactivas();
+        model.addAttribute("titulo", "Canciones inactivas");
         model.addAttribute("canciones", canciones);
         model.addAttribute("contenido", "admin/canciones-inactivas");
         return "layout/main";
@@ -58,6 +60,7 @@ public class AdminCancionController {
     public String nuevaCancion(Model model) {
         CancionRequestDto dto = new CancionRequestDto();
         dto.setFechaAlta(LocalDate.now());
+        model.addAttribute("titulo", "Nueva canción");
         model.addAttribute("cancion", dto);
         model.addAttribute("artistas", artistaService.listarTodos());
         model.addAttribute("generos", generoService.listarTodos());
@@ -101,6 +104,7 @@ public class AdminCancionController {
         dto.setArtistaId(existente.getArtistaId());
         dto.setGeneroId(existente.getGeneroId());
 
+        model.addAttribute("titulo", "Editar canción");
         model.addAttribute("modo", "editar");
         model.addAttribute("id", id);
         model.addAttribute("cancion", dto);

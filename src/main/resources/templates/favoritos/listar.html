@@ -1,0 +1,99 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment" class="text-white">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link th:href="@{/css/base.css}" rel="stylesheet">
+    <link th:href="@{/css/canciones.css}" rel="stylesheet">
+
+    <h3 class="mb-4 text-center">🎶 Top 10 Canciones Más Descargadas</h3>
+
+    <!-- Buscador oculto -->
+    <div class="mb-3 d-none">
+        <input type="text"
+               id="buscador"
+               class="form-control"
+               placeholder="Buscar canción...">
+    </div>
+
+    <div id="contenedor-canciones">
+        <p th:if="${#lists.isEmpty(canciones)}" class="text-center text-secondary">
+            No hay canciones registradas en la base de datos.
+        </p>
+
+        <!-- Lista de canciones -->
+        <div class="row g-3" th:if="${!#lists.isEmpty(canciones)}">
+            <div class="col-6 col-md-3 position-relative"
+                 th:each="cancion, iterStat : ${canciones}">
+
+                <div class="ranking-badge" th:text="${iterStat.index + 1}"></div>
+
+                <div class="card song-card"
+                     th:data-id="${cancion.id}"
+                     th:data-title="${cancion.titulo}">
+
+                    <img th:src="@{/images/default.jpg}"
+                         class="card-img-top"
+                         alt="Imagen de Canción">
+
+                    <div class="card-body text-center">
+                        <h6 class="card-title text-light" th:text="${cancion.titulo}">Título Canción</h6>
+                        <p class="card-text text-secondary" th:text="${cancion.artistaNombre}">Artista</p>
+                        <small class="text-secondary">
+                            Género: <span th:text="${cancion.generoNombre}">Pop</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menú contextual -->
+    <div id="contextMenu" class="context-menu">
+        <a href="#" id="addToPlaylistOption"> + Agregar a Playlist</a>
+        <a href="#" id="downloadSong"> Descargar</a>
+    </div>
+
+    <!-- Modal para seleccionar playlist -->
+    <div class="modal fade" id="selectPlaylistModal" tabindex="-1" aria-labelledby="selectPlaylistModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="selectPlaylistModalLabel">Agregar a Playlist</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addToPlaylistForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="playlistSelect" class="form-label">Selecciona una Playlist</label>
+                            <select id="playlistSelect" name="playlistId" class="form-select bg-dark text-white border-secondary" required>
+                                <option value="" disabled selected>-- Selecciona una Playlist --</option>
+                                <option th:each="playlist : ${playlists}"
+                                        th:value="${playlist.id}"
+                                        th:text="${playlist.nombre}">
+                                </option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="selectedSongId" name="songId">
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas flotantes -->
+    <div id="successAlert" class="alert alert-success alert-fixed">
+        Canción agregada correctamente a la playlist.
+    </div>
+
+    <div id="errorAlert" class="alert alert-danger alert-fixed">
+        La canción ya existe en esta playlist.
+    </div>
+
+    <!-- Scripts -->
+    <script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/canciones.js}"></script>
+</div>
